@@ -1,0 +1,46 @@
+
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /:
+    post:
+      summary: Root
+      operationId: root__post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Model'
+            examples:
+              - summary: An example
+                value:
+                  field_one: example_1
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Model:
+      properties:
+        field_one:
+          type: string
+          title: Field One
+          examples:
+            - individual_example
+        field_two:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Field Two
+          examples:
+            - individual_example
+      type: object
+      required:
+        - field_one
+      title: Model

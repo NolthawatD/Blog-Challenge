@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id         Int       @id @default(autoincrement())
+  username   String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  comment    Comment[]
+  Post       Post[]
+
+  @@map("account")
+}
+
+model Comment {
+  id           Int      @id @default(autoincrement())
+  comment      String
+  commenter_id Int
+  commenter    Account  @relation(fields: [commenter_id], references: [id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  is_deleted   Boolean  @default(false)
+
+  @@map("comment")
+}
+
+model Community {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  is_deleted Boolean  @default(false)
+
+  @@map("community")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  title      String   @db.VarChar(50)
+  content    String   @db.VarChar(500)
+  author_id  Int
+  author     Account  @relation(fields: [author_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  is_deleted Boolean  @default(false)
+
+  @@map("post")
+}
