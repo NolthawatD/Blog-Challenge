@@ -29,6 +29,7 @@ export class PostService extends BaseService {
 					title: data.title,
 					content: data.content,
 					author_id: data.authorId,
+					community_id: data.communityId,
 				},
 			});
 			return sendResponse(savePost, HttpStatus.OK);
@@ -66,6 +67,8 @@ export class PostService extends BaseService {
 					},
 					include: {
 						author: true,
+						comments: true,
+						community: true,
 					},
 				})
 				.withPages({

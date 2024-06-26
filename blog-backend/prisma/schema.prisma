@@ -12,17 +12,19 @@ model Account {
   username   String    @unique
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now())
-  comment    Comment[]
-  Post       Post[]
+  comments   Comment[]
+  posts      Post[]
 
   @@map("account")
 }
 
 model Comment {
-  id           Int      @id @default(autoincrement())
+  id           Int      @id @unique @default(autoincrement())
   comment      String
   commenter_id Int
   commenter    Account  @relation(fields: [commenter_id], references: [id])
+  post_id      Int
+  post         Post     @relation(fields: [post_id], references: [id])
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   is_deleted   Boolean  @default(false)
@@ -31,24 +33,28 @@ model Comment {
 }
 
 model Community {
-  id         Int      @id @default(autoincrement())
+  id         Int      @id @unique @default(autoincrement())
   name       String   @unique @db.VarChar(50)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   is_deleted Boolean  @default(false)
+  posts      Post[]
 
   @@map("community")
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
-  title      String   @db.VarChar(50)
-  content    String   @db.VarChar(500)
-  author_id  Int
-  author     Account  @relation(fields: [author_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  is_deleted Boolean  @default(false)
+  id           Int       @id @unique @default(autoincrement())
+  title        String    @db.VarChar(50)
+  content      String    @db.VarChar(500)
+  community_id Int
+  community    Community @relation(fields: [community_id], references: [id])
+  author_id    Int
+  author       Account   @relation(fields: [author_id], references: [id])
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  is_deleted   Boolean   @default(false)
+  comments     Comment[]
 
   @@map("post")
 }

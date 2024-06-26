@@ -8,4 +8,6 @@ export class CreatePostDto {
 	content: string;
 	@IsInt()
 	authorId: number;
+	@IsInt()
+	communityId: number;
 }

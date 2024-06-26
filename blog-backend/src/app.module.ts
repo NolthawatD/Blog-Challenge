@@ -3,9 +3,10 @@ import { LoggerMiddleware } from "./common/middleware/logger.midleware";
 import { AccountModule } from "./account/account.module";
 import { PostModule } from "./post/post.module";
 import { GlobalService } from "./global/global.service";
+import { CommentModule } from './comment/comment.module';
 
 @Module({
-	imports: [AccountModule, PostModule],
+	imports: [AccountModule, PostModule, CommentModule],
 	providers: [GlobalService],
 	exports: [GlobalService],
 })
