@@ -11,23 +11,29 @@ const Topbar = () => {
 	};
 
 	return (
-		<nav className="bg-custom-green p-4 fixed top-0 left-0 w-full z-10 mb-4">
+		<nav className="bg-green-500 p-4 fixed left-0 w-full z-10">
 			<div className="flex items-center justify-between">
 				<div className="text-white text-2xl font-bold">a Board</div>
 
-				{/* Toggle */}
-				<div className="md:hidden">
-					<button id="menu-toggle" className="text-white" onClick={toggleMenu}>
-						{isMenuOpen ? (
-							<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
-								<path d="M18 12l-6 6M18 12l-6-6"></path> {/* Right arrow for collapsing */}
-							</svg>
-						) : (
-							<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
-								<path d="M4 6h16M4 12h16M4 18h16"></path> {/* Hamburger menu for expanding */}
-							</svg>
-						)}
-					</button>
+				<div>
+					<div className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block">
+						<h3 className="text-white font-semibold">Sign in</h3>
+					</div>
+
+					{/* Toggle */}
+					<div className="md:hidden">
+						<button id="menu-toggle" className="text-white py-2" onClick={toggleMenu}>
+							{isMenuOpen ? (
+								<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
+									<path d="M18 12l-6 6M18 12l-6-6"></path> {/* Right arrow for collapsing */}
+								</svg>
+							) : (
+								<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
+									<path d="M4 6h16M4 12h16M4 18h16"></path> {/* Hamburger menu for expanding */}
+								</svg>
+							)}
+						</button>
+					</div>
 				</div>
 			</div>
 
