@@ -18,10 +18,15 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={inter.className}>
+			<body className={`${inter.className}`}>
 				<Topbar />
 				<Sidebar />
-				{children}
+				<div className="flex h-screen pt-20">
+					<div className="p-40  bg-gray-600"></div>
+					<div className="">
+						<div>{children}</div>
+					</div>
+				</div>
 			</body>
 		</html>
 	);

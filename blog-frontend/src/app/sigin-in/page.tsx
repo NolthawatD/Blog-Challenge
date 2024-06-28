@@ -5,11 +5,10 @@ const SignIn = () => {
 		<div className="flex flex-col lg:flex-row h-screen bg-green-500 lg:bg-green-300">
 			{/* Right side (a Board) */}
 			<div className="flex-1 flex items-center justify-center p-4 lg:p-8 bg-green-300 lg:bg-green-500 lg:rounded-tl-3xl lg:rounded-bl-3xl rounded-bl-3xl rounded-br-3xl lg:rounded-br-none">
-    <div className="text-white text-center lg:text-left">
-        <h1 className="text-4xl font-bold">a Board</h1>
-    </div>
-</div>
-
+				<div className="text-white text-center lg:text-left">
+					<h1 className="text-4xl font-bold">a Board</h1>
+				</div>
+			</div>
 
 			{/* Left side (SignInBox) */}
 			<div className="flex-1 bg-green-500 lg:bg-green-300 flex items-center justify-center p-4 lg:p-8 order-last lg:order-first">

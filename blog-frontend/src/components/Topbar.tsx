@@ -16,7 +16,7 @@ const Topbar = () => {
 				<div className="text-white text-2xl font-bold">a Board</div>
 
 				<div>
-					<div className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block">
+					<div className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb">
 						<h3 className="text-white font-semibold">Sign in</h3>
 					</div>
 
