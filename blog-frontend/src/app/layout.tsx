@@ -20,11 +20,15 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${inter.className}`}>
 				<Topbar />
-				<Sidebar />
+
 				<div className="flex h-screen pt-20">
-					<div className="p-40  bg-gray-600"></div>
-					<div className="">
-						<div>{children}</div>
+					<div className="hidden md:block w-1/4">
+						<Sidebar />
+					</div>
+					<div className="w-full md:w-2/4 ">
+						<main>{children}</main>
+					</div>
+					<div className="hidden md:block w-1/4 ">
 					</div>
 				</div>
 			</body>
