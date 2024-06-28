@@ -103,7 +103,7 @@ export default function Home() {
 											>
 												Dashboard
 											</button>
-											{selectedItem === "Dashboard" && <TrueSigh />}
+											{selectedItem === "Dashboard" && <TrueSign />}
 										</li>
 										<li className="flex items-center justify-between">
 											<button
@@ -114,7 +114,7 @@ export default function Home() {
 											>
 												Settings
 											</button>
-											{selectedItem === "Settings" && <TrueSigh />}
+											{selectedItem === "Settings" && <TrueSign />}
 										</li>
 									</ul>
 								</div>
@@ -135,7 +135,7 @@ export default function Home() {
 	);
 }
 
-const TrueSigh = () => {
+const TrueSign = () => {
 	return (
 		<svg className="w-4 h-4 ml-2 mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
