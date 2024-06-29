@@ -6,6 +6,7 @@ import { GlobalService } from "./global/global.service";
 import { CommentModule } from "./comment/comment.module";
 import { EventsModule } from "./events/events.module";
 import { RouterModule } from "@nestjs/core";
+import { EventsGateway } from "./events/events.gateway";
 
 @Module({
 	imports: [
@@ -13,14 +14,8 @@ import { RouterModule } from "@nestjs/core";
 		PostModule,
 		CommentModule,
 		EventsModule,
-		RouterModule.register([
-			{
-				path: "events",
-				module: EventsModule,
-			},
-		]),
 	],
-	providers: [GlobalService],
+	providers: [GlobalService, EventsGateway],
 	exports: [GlobalService],
 })
 export class AppModule implements NestModule {

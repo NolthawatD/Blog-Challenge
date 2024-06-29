@@ -21,12 +21,12 @@ describe("EventsGateway", () => {
     // Get the gateway instance from the app instance
     gateway = app.get<EventsGateway>(EventsGateway);
     // Create a new client that will interact with the gateway
-    ioClient = io("http://localhost:8080", {
+    ioClient = io("http://localhost:3000", {
       autoConnect: false,
       transports: ["websocket", "polling"],
     });
 
-    app.listen(8080);
+    app.listen(3000);
   });
 
   afterAll(async () => {
