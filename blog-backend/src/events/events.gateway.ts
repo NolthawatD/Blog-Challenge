@@ -1,44 +1,59 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import {
+	ConnectedSocket,
+	MessageBody,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
+	OnGatewayInit,
+	SubscribeMessage,
+	WebSocketGateway,
+	WebSocketServer,
+} from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { Socket } from "socket.io-client";
 
-@WebSocketGateway({ 
-  namespace: '/events',
+interface SignInEvent {
+  clientId: string;
+  payload: string;
+  timestamp: Date;
+}
+@WebSocketGateway({
+	namespace: "/events",
 	cors: {
-    origin: 'http://localhost:3000', // Replace with your Next.js app's URL
-    methods: ['GET', 'POST'],
-    credentials: true,
+    origin: '*',
   },
 })
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private readonly logger = new Logger(EventsGateway.name);
+	private signInEvents: SignInEvent[] = [];
 
 	@WebSocketServer() server: Server;
-
-	@SubscribeMessage('ping')
-  handlePing(@MessageBody() data: string, @ConnectedSocket() client: Socket): { event: string; data: string } {
-    console.log(`Received ping from ${client.id}:`, data);
-    return { event: 'pong', data: 'Pong from server!' };
-  }
 
 	afterInit() {
 		this.logger.log("Initialized");
 	}
 
-	handleConnection(client: any, ...args: any[]) {
+	handleConnection(client: Socket, ...args: any[]) {
 		const { sockets } = this.server.sockets;
-
 		this.logger.log(`Client id: ${client.id} connected`);
-		this.logger.debug(`Number of connected clients: ${sockets?.size}`);
+		// console.log(`signInEvents, ${JSON.stringify(this.signInEvents)}`);
+
+		this.sendExistingEvents(client)
 	}
 
 	handleDisconnect(client: any) {
-		this.logger.log(`Cliend id:${client.id} disconnected`);
+		this.logger.log(`Cliend id: ${client.id} disconnected`);
+
+		// User disconnected
+		const disconnectSign = this.signInEvents.filter((event) => event.clientId == client.id);
+		this.server.emit('disconnectSign', disconnectSign);
+
+		// Remove user disconnected
+		this.signInEvents = this.signInEvents.filter((event) => event.clientId !== client.id);
 	}
 
 	@SubscribeMessage("ping")
-	handleEvent(client: any, data: any) {
+	handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket): { event: string; data: string } {
 		this.logger.log(`Message received from client id: ${client.id}`);
 		this.logger.debug(`Payload: ${data}`);
 		return {
@@ -46,4 +61,33 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			data,
 		};
 	}
+
+
+	@SubscribeMessage("signIn")
+	handleSignIn(@MessageBody() data: string, @ConnectedSocket() client: Socket): { event: string; data: string } {
+		this.logger.log(`Event: signIn`);
+    this.logger.log(`Message received from client id: ${client.id}`);
+    this.logger.debug(`Payload: ${data}`);
+
+		const newEvent: SignInEvent = {
+      clientId: client.id,
+      payload: data,
+      timestamp: new Date()
+    };
+
+		this.signInEvents.push(newEvent);
+
+		this.server.emit('newSignIn', newEvent);
+
+		return {
+			event: "signIn",
+			data,
+		};
+	}
+
+	sendExistingEvents(client: Socket) {
+    client.emit('allSignIn', this.signInEvents);
+  }
+
+
 }
