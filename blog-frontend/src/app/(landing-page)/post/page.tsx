@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState } from "react";
 
 export default function Home() {
@@ -25,7 +26,7 @@ export default function Home() {
 
 	return (
 		<div>
-			<div className="my-6">
+			<div className="pl-0 pr-10 md:pr-60 py-5">
 				<div className="flex items-center space-x-4">
 					{/* Search */}
 					<div className="relative flex-grow">
@@ -165,19 +166,37 @@ const SearchSign = ({ propClass }: { propClass: string }) => {
 
 const Content = () => {
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8">
+		<div className="pl-0 pr-10 md:pr-60 py-5">
+<div className="bg-white rounded-lg shadow-md ">
 			<div className="container mx-auto">
 				<div className="flex flex-row flex-wrap py-4">
 					<aside className="w-full px-2">
-						<div className="sticky top-0 p-4 w-full bg-gray-100 rounded-lg">
+						<div className="sticky top-0 p-4 w-fullrounded-lg">
+							<div className="flex items-center mb-4">
+							<Image className="rounded-full w-10 h-10 me-3" width={50} height={50} alt="icon" src="/assets/image/default.png" />
+							<p className="text-header">Wittawat</p>
+							</div>
+							<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
+								<span className="text-slate-700	">History</span>
+							</div>
+							<h2 className="text-3xl	font-medium	mt-3">The Beginning of the End of the World</h2>
 							<ul className="flex flex-col overflow-hidden rounded-lg">
 								Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur inventore illum recusandae et cupiditate eaque
 								saepe provident repellendus sed voluptatum. Obcaecati cumque porro quia! Architecto iusto est ea aliquid cumque?
+								consectetur adipisicing elit. Consequuntur inventore illum recusandae et cupiditate eaque
+								saepe provident repellendus sed voluptatum. Obcaecati cumque porro quia! Architecto iusto est ea aliquid cumque?
 							</ul>
+							<div className="flex items-center mt-2">
+								<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
+								<span className="me-2 text-span">32</span>
+								<span className="text-span">Comments</span>
+							</div>
 						</div>
 					</aside>
 				</div>
 			</div>
 		</div>
+		</div>
+		
 	);
 };

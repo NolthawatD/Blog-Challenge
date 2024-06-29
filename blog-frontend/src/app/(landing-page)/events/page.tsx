@@ -1,7 +1,7 @@
 "use client";
 
+import useSocket from "@/hooks/useSocket";
 import { useEffect, useState } from "react";
-import useSocket from "../../hooks/useSocket";
 
 export default function Home() {
 	const socket = useSocket("http://localhost:8080/events");

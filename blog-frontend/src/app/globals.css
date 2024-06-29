@@ -17,3 +17,22 @@ body {
     text-wrap: balance;
   }
 }
+
+.bg-gray-300{
+	background-color: #F3F3F3;
+}
+.text-span{
+	color: #939494;
+}
+.text-header{
+	color: #939494;
+}
+
+.text-green-600{
+	color: #49A569;
+}
+.border-green-600	{
+	color: #49A569;
+}
+
+

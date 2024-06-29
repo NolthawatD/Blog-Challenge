@@ -19,18 +19,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${inter.className}`}>
-				<Topbar />
-
-				<div className="flex h-screen pt-20">
-					<div className="hidden md:block w-1/4">
-						<Sidebar />
-					</div>
-					<div className="w-full md:w-2/4 ">
-						<main>{children}</main>
-					</div>
-					<div className="hidden md:block w-1/4 ">
-					</div>
-				</div>
+				<main>{children}</main>
 			</body>
 		</html>
 	);
