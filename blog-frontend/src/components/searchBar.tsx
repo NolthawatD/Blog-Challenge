@@ -138,7 +138,6 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 
 	useEffect(() => {
 		if (pathName === "/our-blog") {
-			console.log("%c === ", "color:red", "  pathName", pathName);
 			blogRefetch();
 		}
 	}, [pathName]);

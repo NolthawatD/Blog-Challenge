@@ -1,6 +1,6 @@
 "use client";
 
-import ContentBlog from "@/components/content";
+import ContentBlog from "@/components/contentBlog";
 import SearchBar from "@/components/searchBar";
 import { useState } from "react";
 
