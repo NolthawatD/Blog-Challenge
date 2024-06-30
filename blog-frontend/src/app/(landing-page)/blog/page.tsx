@@ -74,7 +74,7 @@ export default function Home() {
 				authorId: "",
 				title: searchInput,
 				content: "",
-				communityId: JSON.stringify([1, 2]),
+				communityId: JSON.stringify(communitySelect),
 				page: 1,
 				limit: 10,
 			}),
@@ -94,7 +94,7 @@ export default function Home() {
 
 	useEffect(() => {
 		blogRefetch();
-	}, [searchInput]);
+	}, [searchInput, communitySelect]);
 
 	return (
 		<div>

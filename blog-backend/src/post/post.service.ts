@@ -51,9 +51,10 @@ export class PostService extends BaseService {
 				mode: "insensitive",
 			},
 			author_id: query?.authorId > 0 ? query?.authorId : undefined,
-			community_id: query?.communityId?.length > 0 ? { in: JSON.parse(query?.communityId) } : undefined,
+			community_id: JSON.parse(query?.communityId).length > 0 ? { in: JSON.parse(query?.communityId) } : undefined,
 			is_deleted: false,
 		};
+		console.log("%c === ","color:cyan","  whereCause", whereCause);
 
 		try {
 			const [response, meta] = await this.prismaService
