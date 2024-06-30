@@ -145,7 +145,7 @@ export default function Home() {
 				<Content />
 			</div>
 
-			<div className="">
+			<div className="hidden">
 				{/* <!-- Backdrop --> */}
 				<div id="modal-backdrop" className="fixed inset-0 bg-black bg-opacity-50"></div>
 

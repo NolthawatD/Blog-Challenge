@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState } from "react";
 
 const Topbar = () => {
@@ -43,40 +44,22 @@ const Topbar = () => {
 					isMenuOpen ? "translate-x-0" : "translate-x-full"
 				}`}
 			>
-				<button className="absolute top-4 left-4 text-white" onClick={toggleMenu}>
-					<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
-						<path d="M18 12l-6 6M18 12l-6-6"></path> {/* Right arrow for collapsing */}
-					</svg>
+				<button className="absolute top-4 left-4 text-white mt-10" onClick={toggleMenu}>
+					<Image width={25} height={25} alt="icon" src="/assets/image/ribbon-arrow.svg" />
 				</button>
 				<ul className="py-2 text-sm text-white dark:text-gray-200 mt-10 mx-3" aria-labelledby="dropdownDefaultButton">
-					<li className="flex items-center justify-between">
+					<li className="flex items-center justify-between mt-16">
 						{/* Add home icon in front of Dashboard button */}
 						<button className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}>
-							<svg
-								className="w-4 h-4 me-2"
-								fill="currentColor"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 20 20"
-								aria-hidden="true"
-							>
-								<path d="M10 2.5L2 9.5V18a1 1 0 001 1h5a1 1 0 001-1v-4h2v4a1 1 0 001 1h5a1 1 0 001-1V9.5l-8-7z" />
-							</svg>
-							Dashboard
+							<Image width={25} height={25} alt="icon" src="/assets/image/ribbon-home.svg" />
+							<span className="ml-2">Home</span>
 						</button>
 					</li>
 					<li className="flex items-center justify-between">
 						{/* Add pencil icon in front of Settings button */}
 						<button className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}>
-							<svg
-								className="w-4 h-4 me-2"
-								fill="currentColor"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 20 20"
-								aria-hidden="true"
-							>
-								<path d="M15.586 3.586a2 2 0 010 2.828L7.707 14.293a1 1 0 01-.293.207l-3 1a1 1 0 01-1.271-1.271l1-3a1 1 0 01.207-.293l7.879-7.879a2 2 0 012.828 0zm-2.828-1.414a4 4 0 00-5.656 0l-7.879 7.879a3 3 0 00-.586 1.415l-1 3a3 3 0 003.707 3.707l3-1a3 3 0 001.415-.586l7.879-7.879a4 4 0 000-5.656z" />
-							</svg>
-							Settings
+							<Image width={25} height={25} alt="icon" src="/assets/image/ribbon-blog.svg"/>
+							<span className="ml-2">Our Blog</span>
 						</button>
 					</li>
 				</ul>
