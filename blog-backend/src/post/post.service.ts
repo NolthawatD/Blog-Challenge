@@ -106,6 +106,9 @@ export class PostService extends BaseService {
 						include: {
 							commenter: true,
 						},
+						orderBy: {
+							created_at: 'desc'
+						}
 					},
 					community: true,
 				},
