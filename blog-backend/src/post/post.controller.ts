@@ -21,6 +21,12 @@ export class PostController {
 		res.status(result.status).json(result);
 	}
 
+	@Get(":id")
+	async findOne(@Param("id") id: number, @Res({ passthrough: true }) res: Response) {
+		const result = await this.postService.findOne(id);
+		res.status(result.status).json(result);
+	}
+
 	@Patch(":id")
 	async update(@Param("id") id: number, @Body() updatePostDto: UpdatePostDto, @Res({ passthrough: true }) res: Response) {
 		const result = await this.postService.update(id, updatePostDto);

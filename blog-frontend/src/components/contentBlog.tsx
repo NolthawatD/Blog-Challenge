@@ -1,9 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 interface ContentBlogProps {
 	blogs: any[];
@@ -16,8 +14,8 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 	const pathName = usePathname();
 	const router = useRouter();
 
-	const handleShowDetail = (blog: any) => {
-		router.push(`/blog/${blog?.id}`)
+	const handleShowDetail = (blogId: number) => {
+		router.push(`/blog/${blogId}`);
 	};
 
 	return (
@@ -30,7 +28,7 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 							<div
 								className="container mx-auto hover:bg-gray-50 hover:cursor-pointer"
 								key={blog?.id + Math.random()}
-								onClick={() => handleShowDetail(blog)}
+								onClick={() => handleShowDetail(blog?.id)}
 							>
 								<div className="flex flex-row flex-wrap py-4">
 									<aside className="w-full px-2 ">

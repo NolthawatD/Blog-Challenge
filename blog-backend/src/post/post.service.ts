@@ -17,7 +17,7 @@ export class PostService extends BaseService {
 
 	public async create(data: CreatePostDto) {
 		console.log("Service: create post");
-		console.log("%c === ","color:cyan","  data", data);
+		console.log("%c === ", "color:cyan", "  data", data);
 		try {
 			if (!data.title) throw new BadRequestException("title's required");
 			if (!data.content) throw new BadRequestException("content's required");
@@ -55,7 +55,7 @@ export class PostService extends BaseService {
 			community_id: JSON.parse(query?.communityId).length > 0 ? { in: JSON.parse(query?.communityId) } : undefined,
 			is_deleted: false,
 		};
-		console.log("%c === ","color:cyan","  whereCause", whereCause);
+		console.log("%c === ", "color:cyan", "  whereCause", whereCause);
 
 		try {
 			const [response, meta] = await this.prismaService
@@ -88,6 +88,28 @@ export class PostService extends BaseService {
 				result: response,
 			};
 
+			return sendResponse(result, HttpStatus.OK);
+		} catch (error) {
+			return sendError(error.status, error.message ? error.message : "Something went wrong.");
+		}
+	}
+
+	async findOne(id: number) {
+		try {
+			const result = await this.prismaService.post.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+					comments: {
+						include: {
+							commenter: true,
+						},
+					},
+					community: true,
+				},
+			});
 			return sendResponse(result, HttpStatus.OK);
 		} catch (error) {
 			return sendError(error.status, error.message ? error.message : "Something went wrong.");
