@@ -9,8 +9,9 @@ import { fetchData } from "@/hooks/fetch";
 export default function Detail() {
 	const router = useRouter();
 	const params = useParams();
-	const [blogDetail, setBlogDetail] = useState<any>();
-	console.log("%c === ", "color:cyan", "  blogDetail", blogDetail);
+	const [postDetail, setPostDetail] = useState<any>();
+	const [toggleCommentLaptop, setToggleCommentLaptop] = useState<boolean>(false);
+	console.log("%c === ", "color:cyan", "  postDetail", postDetail);
 
 	const {
 		data: postData,
@@ -18,11 +19,10 @@ export default function Detail() {
 		error: postError,
 	} = useQuery("post", () => fetchData(`post/${params?.id}`, {}), {
 		onSuccess: (data) => {
-			console.log("%c === ", "color:cyan", "  data", data);
-			setBlogDetail(data.data);
+			setPostDetail(data.data);
 		},
 	});
-	console.log("%c === ", "color:cyan", "  blogDetail?.comments", blogDetail?.comments);
+	console.log("%c === ", "color:cyan", "  postDetail?.comments", postDetail?.comments);
 
 	return (
 		<div className="bg-white w-full">
@@ -34,79 +34,87 @@ export default function Detail() {
 					<div className="flex items-center mb-5">
 						<Image className="rounded-full w-10 h-10 me-3" width={50} height={50} alt="icon" src="/assets/image/default.png" />
 						<p className="text-header">
-							{blogDetail?.author?.username} <span className="text-span text-xs ms-3">5mo. ago xxxxxx</span>
+							{postDetail?.author?.username} <span className="text-span text-xs ms-3">5mo. ago xxxxxx</span>
 						</p>
 					</div>
 					<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
-						<span className="text-slate-700	">{blogDetail?.community?.name}</span>
+						<span className="text-slate-700	">{postDetail?.community?.name}</span>
 					</div>
-					<h2 className="text-3xl	font-medium	mt-3">{blogDetail?.title}</h2>
-					<ul className="flex flex-col overflow-hidden rounded-lg ">{blogDetail?.content}</ul>
+					<h2 className="text-3xl	font-medium	mt-3">{postDetail?.title}</h2>
+					<ul className="flex flex-col overflow-hidden rounded-lg ">{postDetail?.content}</ul>
 
 					<div className="flex items-center mt-5">
 						<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
-						<span className="me-2 text-span">32</span>
+						<span className="me-2 text-span">{postDetail?.comments?.length}</span>
 						<span className="text-span">Comments</span>
 					</div>
 				</div>
-				<div className="my-5 block md:hidden">
-					<button
-						type="button"
-						className="bg-white border border-custom-success	 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-					>
-						Add Comments mobile
-					</button>
-				</div>
 
-				<div className="my-5 hidden md:block">
-					<button
-						type="button"
-						className="bg-white border border-custom-success	 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-					>
-						Add Comments laptop
-					</button>
-				</div>
-
-				<div className="hidden md:block">
-					<div>
-						<label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
-						<textarea
-							id="message"
-							rows={4}
-							className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							placeholder="Write your thoughts here..."
-						></textarea>
-					</div>
-
-					<div className="flex justify-end my-4  ">
+				<div className="pl-5">
+					<div className="my-5 block md:hidden">
 						<button
 							type="button"
 							className="bg-white border border-custom-success	 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
 						>
-							Cancel
+							Add Comments mobile
 						</button>
+					</div>
+
+					{/* LAPTOP */}
+					<div className="my-5 hidden md:block">
 						<button
 							type="button"
-							className="bg-custom-success border-transparent text-white focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+							onClick={() => setToggleCommentLaptop(!toggleCommentLaptop)}
+							className="bg-white border border-custom-success	 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
 						>
-							Post
+							Add Comments
 						</button>
 					</div>
-				</div>
 
-				{blogDetail?.comments?.map((comment: any) => (
-					<div>
-						<div className="flex items-start mb-5">
-							<Image className="rounded-full w-10 h-10 me-3" width={50} height={50} alt="icon" src="/assets/image/default.png" />
+					{toggleCommentLaptop && (
+						<div className="hidden md:block">
 							<div>
-								<p className="text-header mb-4">
-									{comment?.commenter?.username} <span className="text-span text-xs ms-3">5mo. ago {comment?.created_at}</span>
-								</p>
-								<p>{comment?.comment}</p>
+								<label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+								<textarea
+									id="message"
+									rows={4}
+									className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+									placeholder="Write your thoughts here..."
+								></textarea>
+							</div>
+
+							<div className="flex justify-end my-4  ">
+								<button
+									type="button"
+									className="bg-white border border-custom-success	 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+								>
+									Cancel
+								</button>
+								<button
+									type="button"
+									className="bg-custom-success border-transparent text-white focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-custom-success dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+								>
+									Post
+								</button>
 							</div>
 						</div>
-					</div>
-				))}
+					)}
+					{/* END LAPTOP */}
+
+					{postDetail?.comments?.map((comment: any) => (
+						<div>
+							<div className="flex items-start mb-5">
+								<Image className="rounded-full w-10 h-10 me-3" width={50} height={50} alt="icon" src="/assets/image/default.png" />
+								<div>
+									<p className="text-header mb-4">
+										{comment?.commenter?.username} <span className="text-span text-xs ms-3">5mo. ago {comment?.created_at}</span>
+									</p>
+									<p>{comment?.comment}</p>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
 
 			<div>
