@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 
 interface ModalEditProps {
-	handleToggleEdit?: () => void;
+	handleToggleEdit: (blogEdit: any) => void;
 }
 
 export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
@@ -17,7 +17,6 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 		setSelectedCommunity(community);
 		setDropdownOpenModal(false);
 	};
-
 
 	const [communities, setCommunities] = useState([]);
 
@@ -41,7 +40,7 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 							type="button"
 							className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
 							data-modal-toggle="crud-modal"
-							onClick={handleToggleEdit}
+							onClick={() => handleToggleEdit(undefined)}
 						>
 							<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
 								<path
@@ -123,7 +122,7 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 								<button
 									type="button"
 									className="w-full sm:w-32 px-4 sm:px-6 py-2 rounded-md border border-custom-success text-custom-success"
-									onClick={handleToggleEdit}
+									onClick={() => handleToggleEdit(undefined)}
 								>
 									Cancel
 								</button>

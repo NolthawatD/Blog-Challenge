@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 interface ContentBlogProps {
 	blogs: any[];
-	handleToggleRemove?: () => void;
-	handleToggleEdit?: () => void;
-	// setToggleModalRemove?: React.Dispatch<React.SetStateAction<boolean>>;
+	handleToggleRemove: (blogId: number | undefined) => void;
+	handleToggleEdit: (blogId: number | undefined) => void;
+	setToggleModalRemove?: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdit }: ContentBlogProps) {
@@ -17,7 +17,7 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 			{/* Content */}
 			<div className="md:px-0 px-4">
 				<div className="pl-0 py-5 md:pr-60">
-					<div className="bg-white rounded-lg shadow-md border-b-2">
+					<div className="bg-white rounded-lg shadow-md">
 						{blogs?.map((blog: any) => (
 							<div className="container mx-auto" key={blog?.id + Math.random()}>
 								<div className="flex flex-row flex-wrap py-4">
@@ -42,7 +42,7 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 															height={20}
 															alt="icon"
 															src="/assets/image/edit-pencil.svg"
-															onClick={handleToggleEdit}
+															onClick={() => handleToggleEdit(blog)}
 														/>
 														<Image
 															className="mr-6"
@@ -50,7 +50,7 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 															height={20}
 															alt="icon"
 															src="/assets/image/edit-trash.svg"
-															onClick={handleToggleRemove}
+															onClick={() => handleToggleRemove(blog?.id)}
 														/>
 													</div>
 												)}

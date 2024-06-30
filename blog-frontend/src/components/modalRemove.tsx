@@ -1,10 +1,43 @@
+import { backendAPI } from "@/hooks/apiConfig";
 import React from "react";
+import { useMutation, useQueryClient } from "react-query";
 
 interface ModalRemoveProps {
-	handleToggleRemove?: () => void;
+	handleToggleRemove: (blogId: number | undefined) => void;
+	blogRemoveId: number | undefined;
 }
 
-export function ModalRemove({ handleToggleRemove }: ModalRemoveProps) {
+async function deleteBlog(blogId: number) {
+	const response = await fetch(`${backendAPI}/post/${blogId}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error("Network response was not ok");
+	}
+
+	return response.json();
+}
+
+export function ModalRemove({ handleToggleRemove, blogRemoveId }: ModalRemoveProps) {
+	const queryClient = useQueryClient();
+
+	const mutation = useMutation((blogId: number) => deleteBlog(blogId), {
+		onSuccess: () => {
+			queryClient.invalidateQueries("blogs");
+			handleToggleRemove(undefined);
+		},
+	});
+
+	const handleDelete = () => {
+		if (blogRemoveId !== undefined) {
+			mutation.mutate(blogRemoveId);
+		}
+	};
+
 	return (
 		<>
 			<div className="">
@@ -34,13 +67,13 @@ export function ModalRemove({ handleToggleRemove }: ModalRemoveProps) {
 									<button
 										type="button"
 										className="w-full sm:w-32 px-4 sm:px-6 py-2 border text-gray-500 rounded-md"
-										onClick={handleToggleRemove}
+										onClick={() => handleToggleRemove(undefined)}
 									>
 										Cancel
 									</button>
 								</div>
 								<div className="w-80 sm:w-auto">
-									<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-red-500 text-white rounded-md">
+									<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-red-500 text-white rounded-md" onClick={handleDelete}>
 										Delete
 									</button>
 								</div>

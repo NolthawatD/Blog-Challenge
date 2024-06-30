@@ -4,40 +4,39 @@ import ContentBlog from "@/components/contentBlog";
 import ModalEdit from "@/components/modalEdit";
 import ModalRemove from "@/components/modalRemove";
 import SearchBar from "@/components/searchBar";
-import { fetchData } from "@/hooks/fetch";
-import { mutationData } from "@/hooks/mutation";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useMutation, useQueryClient } from "react-query";
+import { useState } from "react";
 
 export default function OurBlog() {
-	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
-	const [selectedCommunity, setSelectedCommunity] = useState<string>("");
+	const [blogs, setBlogs] = useState<any[]>([]);
+	const [blogRemoveId, setBlogRemoveId] = useState<number | undefined>();
+	const [blogEdit, setBlogEdit] = useState<any>()
 	const [toggleModalRemove, setToggleModalRemove] = useState<boolean>(false);
 	const [toggleModalEdit, setToggleModalEdit] = useState<boolean>(false);
 
-	const handleToggleRemove = () => setToggleModalRemove(!toggleModalRemove);
-	const handleToggleEdit = () => setToggleModalEdit(!toggleModalEdit);
-
-	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
-	const handleCommunitySelect = (community: string) => {
-		setSelectedCommunity(community);
-		setDropdownOpenModal(false);
+	const handleToggleRemove = (blogRemoveId: number | undefined) => {
+		setToggleModalRemove(!toggleModalRemove);
+		setBlogRemoveId(blogRemoveId);
+		setBlogEdit
 	};
-
-	const [blogs, setBlogs] = useState<any[]>([]);
-	const [communities, setCommunities] = useState([]);
+	const handleToggleEdit = (blogEdit: number| undefined) => {
+		setToggleModalEdit(!toggleModalEdit);
+		setBlogEdit(blogEdit)
+	};
 
 	return (
 		<div>
 			<SearchBar setBlogs={setBlogs} />
-			<ContentBlog blogs={blogs} handleToggleRemove={handleToggleRemove} handleToggleEdit={handleToggleEdit} />
-
-			{toggleModalEdit && <ModalEdit handleToggleEdit={handleToggleEdit} />}
-
-			{toggleModalRemove && <ModalRemove handleToggleRemove={handleToggleRemove} />}
+			<ContentBlog 
+				blogs={blogs} 
+				handleToggleRemove={handleToggleRemove} 
+				handleToggleEdit={handleToggleEdit} 
+			/>
+			{toggleModalEdit && 
+				<ModalEdit handleToggleEdit={handleToggleEdit} />
+			}
+			{toggleModalRemove && 
+				<ModalRemove handleToggleRemove={handleToggleRemove} blogRemoveId={blogRemoveId}/>
+			}
 		</div>
 	);
 }
