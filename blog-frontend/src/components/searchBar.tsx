@@ -7,14 +7,9 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useMutation, useQueryClient } from "react-query";
 
-export default function Home() {
+export default function SearchBar() {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const [selectedItem, setSelectedItem] = useState<string | null>(null);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-	const handleItemClick = (item: string) => {
-		setSelectedItem(item);
-	};
 
 	const toggleDropdown = () => {
 		setDropdownOpen(!dropdownOpen);
@@ -29,27 +24,20 @@ export default function Home() {
 	};
 
 	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
-	const [selectedCommunity, setSelectedCommunity] = useState("");
 
 	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
-	const handleCommunitySelect = (community: string) => {
-		setSelectedCommunity(community);
-		setDropdownOpenModal(false);
-	};
 
-	const [toggleModalEdit, setToggleModalEdit] = useState(false);
-	
 	const [blogs, setBlogs] = useState([]);
 	const [communities, setCommunities] = useState([]);
 	const [searchInput, setSearchInput] = useState("");
 	const [communitySelect, setCommunitySelect] = useState<number[]>([]);
-	const [newTitle, setNewTitle] = useState("");
-	const [newContent, setNewContent] = useState("");
 
 	const [toggleModalCreate, setToggleModalCreate] = useState(false);
-	const [communityNameCreate, setCommunityNameCreate] = useState<string>("");
-	const [authorId, setAuthorId] = useState<number | null>(null);
 	const [communityIdCreate, setCommunityIdCreate] = useState<number>(0);
+	const [communityNameCreate, setCommunityNameCreate] = useState<string>("");
+	const [newTitle, setNewTitle] = useState("");
+	const [newContent, setNewContent] = useState("");
+	const [authorId, setAuthorId] = useState(0);
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation(
@@ -62,61 +50,27 @@ export default function Home() {
 		}
 	);
 
-	const {
-		data: communityData,
-		isLoading: communityIsLoading,
-		error: communityError,
-	} = useQuery("communities", () => fetchData("community"), {
-		onSuccess: (data) => {
-			setCommunities(data.datas);
-		},
-	});
+	const handleCommunityCreate = (communityId: number, communityName: string) => {
+		setCommunityIdCreate(communityId);
+		setCommunityNameCreate(communityName);
+		setDropdownOpenModal(false);
+	};
 
-	const {
-		data: blogData,
-		isLoading: blogIsLoading,
-		error: blogError,
-		refetch: blogRefetch,
-	} = useQuery(
-		["blogs", authorId, searchInput, communitySelect],
-		() =>
-			fetchData("post", {
-				authorId: authorId,
-				title: searchInput,
-				content: "",
-				communityId: JSON.stringify(communitySelect),
-				page: 1,
-				limit: 10,
-			}),
-		{
-			onSuccess: (data: any) => {
-				// console.log("%c === ", "color:cyan", "  data", data?.data?.result);
-				setBlogs(data?.data?.result);
-			},
-			enabled: authorId !== null,
+	const handleToggleModalCreate = () => {
+		setToggleModalCreate(!toggleModalCreate);
+		if (toggleModalCreate === false) {
+			setCommunityIdCreate(0);
+			setCommunityNameCreate("");
+			setNewTitle("");
+			setNewContent("");
 		}
-	);
+		blogRefetch();
+	};
 
 	useEffect(() => {
 		const _authorId = localStorage.getItem("userId");
-		if (_authorId) {
-			setAuthorId(Number(_authorId));
-		}
+		setAuthorId(Number(_authorId));
 	}, []);
-
-	useEffect(() => {
-		blogRefetch();
-	}, [searchInput, communitySelect]);
-
-	const handleCommunityQuery = (comId: number) => {
-		setCommunitySelect((prevCommunitySelect) => {
-			if (prevCommunitySelect.includes(comId)) {
-				return prevCommunitySelect.filter((id) => id !== comId);
-			} else {
-				return [...prevCommunitySelect, comId];
-			}
-		});
-	};
 
 	const handleCreateNewPost = () => {
 		if (!communityNameCreate) {
@@ -141,25 +95,63 @@ export default function Home() {
 		handleToggleModalCreate();
 	};
 
-	const handleCommunityCreate = (communityId: number, communityName: string) => {
-		setCommunityIdCreate(communityId);
-		setCommunityNameCreate(communityName);
-		setDropdownOpenModal(false);
+	const handleCommunityQuery = (comId: number) => {
+		setCommunitySelect((prevCommunitySelect) => {
+			if (prevCommunitySelect.includes(comId)) {
+				return prevCommunitySelect.filter((id) => id !== comId);
+			} else {
+				return [...prevCommunitySelect, comId];
+			}
+		});
 	};
 
-	const handleToggleModalCreate = () => {
-		setToggleModalCreate(!toggleModalCreate);
-		if (toggleModalCreate === false) {
-			setCommunityIdCreate(0);
-			setCommunityNameCreate("");
-			setNewTitle("");
-			setNewContent("");
+	const {
+		data: communityData,
+		isLoading: communityIsLoading,
+		error: communityError,
+	} = useQuery("communities", () => fetchData("community"), {
+		onSuccess: (data) => {
+			setCommunities(data.datas);
+		},
+	});
+
+	const {
+		data: blogData,
+		isLoading: blogIsLoading,
+		error: blogError,
+		refetch: blogRefetch,
+	} = useQuery(
+		"blogs",
+		() =>
+			fetchData("post", {
+				authorId: "",
+				title: searchInput,
+				content: "",
+				communityId: JSON.stringify(communitySelect),
+				page: 1,
+				limit: 10,
+			}),
+		{
+			onSuccess: (data) => {
+				console.log("%c === ", "color:cyan", "  data", data?.data?.result);
+				setBlogs(data?.data?.result);
+			},
 		}
-	};
+	);
+
+	useEffect(() => {
+		if (!communityIsLoading && !blogIsLoading) {
+			console.log("Both queries are complete");
+		}
+	}, [communityIsLoading, blogIsLoading]);
+
+	useEffect(() => {
+		blogRefetch();
+	}, [searchInput, communitySelect]);
 
 	return (
 		<div>
-			<div className="pl-0 pr-10 md:pr-60 py-5">
+			<div className="pl-0 pr-10 md:pr-60 py-5 mt-7">
 				<div className="flex items-center space-x-4">
 					{/* Search */}
 					<div className="relative flex-grow">
@@ -185,7 +177,8 @@ export default function Home() {
 								required
 								onBlur={handleSearchBlur}
 								autoFocus
-								onChange={(e) => setSearchInput(e.target.value)}
+								onChange={(e: any) => setSearchInput(e.target.value)}
+								value={searchInput}
 							/>
 						)}
 
@@ -196,7 +189,7 @@ export default function Home() {
 							className="hidden sm:block w-full p-3 ps-10 bg-custom-page-bg text-sm text-black border border-gray-300 rounded-lg"
 							placeholder="Search"
 							required
-							onChange={(e) => setSearchInput(e.target.value)}
+							onChange={(e: any) => setSearchInput(e.target.value)}
 						/>
 					</div>
 
@@ -248,7 +241,11 @@ export default function Home() {
 							</div>
 
 							{/* Create */}
-							<button type="submit" className="text-white bg-custom-success font-medium rounded-lg text-sm px-6 py-3">
+							<button
+								type="submit"
+								className="text-white bg-custom-success font-medium rounded-lg text-sm px-6 py-3"
+								onClick={() => handleToggleModalCreate()}
+							>
 								Create+
 							</button>
 						</>
@@ -256,52 +253,8 @@ export default function Home() {
 				</div>
 			</div>
 
-			{/* Content */}
-			<div className="md:px-0 px-4">
-				<div className="pl-0 py-5 md:pr-60">
-					<div className="bg-white rounded-lg shadow-md ">
-						{blogs?.map((blog: any) => (
-							<div className="container mx-auto" key={blog?.id + Math.random()}>
-								<div className="flex flex-row flex-wrap py-4">
-									<aside className="w-full px-2">
-										<div className="sticky top-0 p-4 w-fullrounded-lg">
-											<div className="flex items-center mb-4 justify-between">
-												<div className="flex items-center">
-													<Image
-														className="rounded-full w-10 h-10 mr-3"
-														width={50}
-														height={50}
-														alt="icon"
-														src="/assets/image/default.png"
-													/>
-													<p className="text-header">Wittawat</p>
-												</div>
-												<div className="flex items-center">
-													<Image className="mr-6" width={20} height={20} alt="icon" src="/assets/image/edit-trash.svg" />
-													<Image className=" mr-3" width={20} height={20} alt="icon" src="/assets/image/edit-pencil.svg" />
-												</div>
-											</div>
-											<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
-												<span className="text-slate-700	">{blog?.community?.name}</span>
-											</div>
-											<h2 className="text-3xl	font-medium	mt-3">{blog?.title}</h2>
-											<ul className="flex flex-col overflow-hidden rounded-lg">{blog?.content}</ul>
-											<div className="flex items-center mt-2">
-												<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
-												<span className="me-2 text-span">32</span>
-												<span className="text-span">Comments</span>
-											</div>
-										</div>
-									</aside>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</div>
-
-			{toggleModalEdit && (
-				<div>
+			{toggleModalCreate && (
+				<div className="">
 					{/* <!-- Backdrop --> */}
 					<div id="modal-backdrop" className="fixed inset-0 bg-black bg-opacity-50"></div>
 
@@ -315,11 +268,12 @@ export default function Home() {
 						<div className="relative bg-white rounded-lg shadow-xl sm:mx-0 mx-4">
 							{/* <!-- Modal header --> */}
 							<div className="flex items-center justify-between p-6 border-b">
-								<h3 className="text-xl font-semibold text-gray-900">Edit Post</h3>
+								<h3 className="text-xl font-semibold text-gray-900">Create Post</h3>
 								<button
 									type="button"
 									className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
 									data-modal-toggle="crud-modal"
+									onClick={() => handleToggleModalCreate()}
 								>
 									<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
 										<path
@@ -333,7 +287,7 @@ export default function Home() {
 								</button>
 							</div>
 
-							<form className="p-6">
+							<div className="p-6">
 								{/* Community selection dropdown */}
 								<div className="mb-4">
 									<button
@@ -342,7 +296,7 @@ export default function Home() {
 										type="button"
 										className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
 									>
-										{selectedCommunity || "Choose a community"}
+										{communityNameCreate || "Choose a community"}
 										<svg
 											className="w-4 h-4 ml-2"
 											fill="none"
@@ -357,16 +311,16 @@ export default function Home() {
 									{dropdownOpenModal && (
 										<div className="relative">
 											<ul className="absolute z-10 w-full py-2 mt-1 bg-white rounded-md shadow-lg">
-												{communities.map((community) => (
-													<li key={community}>
+												{communities.map((community: any) => (
+													<li key={community.name + "create post"}>
 														<button
-															onClick={() => handleCommunitySelect(community)}
+															onClick={() => handleCommunityCreate(community.id, community.name)}
 															className={`flex justify-between items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 ${
-																selectedCommunity === community ? "bg-green-50" : ""
+																communityIdCreate === community.id ? "bg-green-50" : ""
 															}`}
 														>
-															<span>{community}</span>
-															{selectedCommunity === community && (
+															<span>{community.name}</span>
+															{communityIdCreate === community.id && (
 																<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
 																	<path
 																		fillRule="evenodd"
@@ -387,6 +341,7 @@ export default function Home() {
 									id="title"
 									className="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 									placeholder="Title"
+									onChange={(e: any) => setNewTitle(e.target.value)}
 								/>
 
 								<textarea
@@ -394,6 +349,7 @@ export default function Home() {
 									rows={10}
 									className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 									placeholder="What's on your mind..."
+									onChange={(e: any) => setNewContent(e.target.value)}
 								></textarea>
 
 								<div className="flex flex-col-reverse sm:flex-row sm:justify-end items-center space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4 mt-6">
@@ -401,64 +357,26 @@ export default function Home() {
 										<button
 											type="button"
 											className="w-full sm:w-32 px-4 sm:px-6 py-2 rounded-md border border-custom-success text-custom-success"
+											onClick={() => handleToggleModalCreate()}
 										>
 											Cancel
 										</button>
 									</div>
 									<div className="w-80 sm:w-auto">
-										<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-custom-success text-white rounded-md">
+										<button
+											type="submit"
+											className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-custom-success text-white rounded-md"
+											onClick={() => handleCreateNewPost()}
+										>
 											Post
 										</button>
 									</div>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			)}
-
-			{/* <!-- Confirm Modal --> */}
-
-			<div className="hidden">
-				{/* <!-- Backdrop --> */}
-				<div id="modal-backdrop" className="fixed inset-0 bg-black bg-opacity-50"></div>
-
-				{/* <!-- Main modal --> */}
-				<div
-					id="crud-modal"
-					tabIndex={-1}
-					aria-hidden="true"
-					className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-sm"
-				>
-					<div className="relative bg-white rounded-lg shadow-xl sm:mx-0 mx-4">
-						{/* Modal header */}
-						<div className="pt-6">
-							<h3 className="tracking-tighter text-2xl text-center font-medium text-black md:text-xl dark:text-gray-400 pb-3 md:mx-14">
-								Please confirm if you wish to delete the post
-							</h3>
-							<p className="tracking-tighter text-gray-500 text-center md:text-lg dark:text-gray-400 md:mx-5">
-								Are you sure you want to delete the post? Once deleted, it cannot be recovered.
-							</p>
-						</div>
-						<div className="pb-6">
-							<div className="flex flex-col-reverse sm:flex-row justify-center items-center space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4 mt-6">
-								<div className="w-80 sm:w-auto">
-									<button type="button" className="w-full sm:w-32 px-4 sm:px-6 py-2 border text-gray-500 rounded-md">
-										Cancel
-									</button>
-								</div>
-								<div className="w-80 sm:w-auto">
-									<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-red-500 text-white rounded-md">
-										Delete
-									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-
-			{/* <!-- End Confirm Modal --> */}
+			)}
 		</div>
 	);
 }

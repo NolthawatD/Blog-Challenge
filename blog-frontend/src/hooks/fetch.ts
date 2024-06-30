@@ -4,9 +4,6 @@ export const fetchData = async (routeName: string, queryParams: any = {}) => {
 	const url = new URL(backendAPI + "/" + routeName);
 	const params = new URLSearchParams(queryParams);
 
-	if (queryParams.communityId) {
-		// queryParams.communityId.forEach((id: any) => params.append("communityId", id));
-	}
 	console.log("%c === ","color:cyan","  queryParams", queryParams);
 
 	url.search = params.toString();
