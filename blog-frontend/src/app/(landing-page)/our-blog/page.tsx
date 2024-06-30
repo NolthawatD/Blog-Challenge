@@ -1,5 +1,7 @@
 "use client";
 
+import ContentBlog from "@/components/content";
+import SearchBar from "@/components/searchBar";
 import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
 import Image from "next/image";
@@ -9,25 +11,6 @@ import { useMutation, useQueryClient } from "react-query";
 
 export default function Home() {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const [selectedItem, setSelectedItem] = useState<string | null>(null);
-	const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-	const handleItemClick = (item: string) => {
-		setSelectedItem(item);
-	};
-
-	const toggleDropdown = () => {
-		setDropdownOpen(!dropdownOpen);
-	};
-
-	const handleSearchFocus = () => {
-		setIsSearchFocused(true);
-	};
-
-	const handleSearchBlur = () => {
-		setIsSearchFocused(false);
-	};
-
 	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
 	const [selectedCommunity, setSelectedCommunity] = useState("");
 
@@ -38,267 +21,14 @@ export default function Home() {
 	};
 
 	const [toggleModalEdit, setToggleModalEdit] = useState(false);
-	
-	const [blogs, setBlogs] = useState([]);
+
+	const [blogs, setBlogs] = useState<any[]>([]);
 	const [communities, setCommunities] = useState([]);
-	const [searchInput, setSearchInput] = useState("");
-	const [communitySelect, setCommunitySelect] = useState<number[]>([]);
-	const [newTitle, setNewTitle] = useState("");
-	const [newContent, setNewContent] = useState("");
-
-	const [toggleModalCreate, setToggleModalCreate] = useState(false);
-	const [communityNameCreate, setCommunityNameCreate] = useState<string>("");
-	const [authorId, setAuthorId] = useState<number | null>(null);
-	const [communityIdCreate, setCommunityIdCreate] = useState<number>(0);
-	const queryClient = useQueryClient();
-
-	const mutation = useMutation(
-		async () => await mutationData("post", { title: newTitle, content: newContent, authorId: authorId, communityId: communityIdCreate }),
-		{
-			onSuccess: () => {
-				queryClient.invalidateQueries("post");
-				blogRefetch();
-			},
-		}
-	);
-
-	const {
-		data: communityData,
-		isLoading: communityIsLoading,
-		error: communityError,
-	} = useQuery("communities", () => fetchData("community"), {
-		onSuccess: (data) => {
-			setCommunities(data.datas);
-		},
-	});
-
-	const {
-		data: blogData,
-		isLoading: blogIsLoading,
-		error: blogError,
-		refetch: blogRefetch,
-	} = useQuery(
-		["blogs", authorId, searchInput, communitySelect],
-		() =>
-			fetchData("post", {
-				authorId: authorId,
-				title: searchInput,
-				content: "",
-				communityId: JSON.stringify(communitySelect),
-				page: 1,
-				limit: 10,
-			}),
-		{
-			onSuccess: (data: any) => {
-				// console.log("%c === ", "color:cyan", "  data", data?.data?.result);
-				setBlogs(data?.data?.result);
-			},
-			enabled: authorId !== null,
-		}
-	);
-
-	useEffect(() => {
-		const _authorId = localStorage.getItem("userId");
-		if (_authorId) {
-			setAuthorId(Number(_authorId));
-		}
-	}, []);
-
-	useEffect(() => {
-		blogRefetch();
-	}, [searchInput, communitySelect]);
-
-	const handleCommunityQuery = (comId: number) => {
-		setCommunitySelect((prevCommunitySelect) => {
-			if (prevCommunitySelect.includes(comId)) {
-				return prevCommunitySelect.filter((id) => id !== comId);
-			} else {
-				return [...prevCommunitySelect, comId];
-			}
-		});
-	};
-
-	const handleCreateNewPost = () => {
-		if (!communityNameCreate) {
-			alert("Please choose community");
-			return;
-		}
-		if (!newTitle) {
-			alert("Please enter title");
-			return;
-		}
-		if (!newContent) {
-			alert("Plese enter content");
-			return;
-		}
-		if (!authorId) {
-			alert("Please sign in before");
-			return;
-		}
-
-		mutation.mutate();
-
-		handleToggleModalCreate();
-	};
-
-	const handleCommunityCreate = (communityId: number, communityName: string) => {
-		setCommunityIdCreate(communityId);
-		setCommunityNameCreate(communityName);
-		setDropdownOpenModal(false);
-	};
-
-	const handleToggleModalCreate = () => {
-		setToggleModalCreate(!toggleModalCreate);
-		if (toggleModalCreate === false) {
-			setCommunityIdCreate(0);
-			setCommunityNameCreate("");
-			setNewTitle("");
-			setNewContent("");
-		}
-	};
 
 	return (
 		<div>
-			<div className="pl-0 pr-10 md:pr-60 py-5">
-				<div className="flex items-center space-x-4">
-					{/* Search */}
-					<div className="relative flex-grow">
-						{/* Mobile View: Show SearchSign initially */}
-						<div
-							className={`absolute inset-y-0 start-0 flex items-center ps-3 sm:pointer-events-auto ${
-								isSearchFocused ? "hidden sm:flex" : "block sm:flex"
-							}`}
-						>
-							<button onClick={handleSearchFocus} className="sm:hidden">
-								<SearchSign propClass="" />
-							</button>
-							<SearchSign propClass="hidden sm:block" />
-						</div>
-
-						{/* Mobile View: Show Input when SearchSign is clicked */}
-						{isSearchFocused && (
-							<input
-								type="search"
-								id="default-search"
-								className="block w-full p-3 ps-10 bg-custom-page-bg text-sm text-black border border-gray-300 rounded-lg sm:hidden"
-								placeholder="Search"
-								required
-								onBlur={handleSearchBlur}
-								autoFocus
-								onChange={(e) => setSearchInput(e.target.value)}
-							/>
-						)}
-
-						{/* Desktop View: Always show Input */}
-						<input
-							type="search"
-							id="default-search"
-							className="hidden sm:block w-full p-3 ps-10 bg-custom-page-bg text-sm text-black border border-gray-300 rounded-lg"
-							placeholder="Search"
-							required
-							onChange={(e) => setSearchInput(e.target.value)}
-						/>
-					</div>
-
-					{/* Dropdown and Create Button */}
-					{!isSearchFocused && (
-						<>
-							{/* Dropdown */}
-							<div className="relative">
-								<button
-									id="dropdownDefaultButton"
-									onClick={toggleDropdown}
-									className="text-black font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
-									type="button"
-								>
-									Community
-									<svg
-										className="w-2.5 h-2.5 ms-3"
-										aria-hidden="true"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 10 6"
-									>
-										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-									</svg>
-								</button>
-
-								<div
-									id="dropdown"
-									className={`absolute top-full mt-2 ${
-										dropdownOpen ? "block" : "hidden"
-									} bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 z-20`}
-								>
-									<ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-										{communities?.map((community: any) => (
-											<li className="flex items-center justify-between" key={community.name}>
-												<button
-													onClick={() => handleCommunityQuery(community.id)}
-													className={`block px-4 py-2 items-center ${
-														communitySelect.includes(community.id) ? "font-medium text-black" : ""
-													}`}
-												>
-													{community.name}
-												</button>
-												{communitySelect.includes(community.id) && <TrueSign />}
-											</li>
-										))}
-									</ul>
-								</div>
-							</div>
-
-							{/* Create */}
-							<button type="submit" className="text-white bg-custom-success font-medium rounded-lg text-sm px-6 py-3">
-								Create+
-							</button>
-						</>
-					)}
-				</div>
-			</div>
-
-			{/* Content */}
-			<div className="md:px-0 px-4">
-				<div className="pl-0 py-5 md:pr-60">
-					<div className="bg-white rounded-lg shadow-md ">
-						{blogs?.map((blog: any) => (
-							<div className="container mx-auto" key={blog?.id + Math.random()}>
-								<div className="flex flex-row flex-wrap py-4">
-									<aside className="w-full px-2">
-										<div className="sticky top-0 p-4 w-fullrounded-lg">
-											<div className="flex items-center mb-4 justify-between">
-												<div className="flex items-center">
-													<Image
-														className="rounded-full w-10 h-10 mr-3"
-														width={50}
-														height={50}
-														alt="icon"
-														src="/assets/image/default.png"
-													/>
-													<p className="text-header">Wittawat</p>
-												</div>
-												<div className="flex items-center">
-													<Image className="mr-6" width={20} height={20} alt="icon" src="/assets/image/edit-trash.svg" />
-													<Image className=" mr-3" width={20} height={20} alt="icon" src="/assets/image/edit-pencil.svg" />
-												</div>
-											</div>
-											<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
-												<span className="text-slate-700	">{blog?.community?.name}</span>
-											</div>
-											<h2 className="text-3xl	font-medium	mt-3">{blog?.title}</h2>
-											<ul className="flex flex-col overflow-hidden rounded-lg">{blog?.content}</ul>
-											<div className="flex items-center mt-2">
-												<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
-												<span className="me-2 text-span">32</span>
-												<span className="text-span">Comments</span>
-											</div>
-										</div>
-									</aside>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</div>
+			<SearchBar setBlogs={setBlogs} />
+			<ContentBlog blogs={blogs} />
 
 			{toggleModalEdit && (
 				<div>
@@ -462,31 +192,3 @@ export default function Home() {
 		</div>
 	);
 }
-
-const TrueSign = () => {
-	return (
-		<svg className="w-4 h-4 ml-2 mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-		</svg>
-	);
-};
-
-const SearchSign = ({ propClass }: { propClass: string }) => {
-	return (
-		<svg
-			className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${propClass}`}
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 20 20"
-		>
-			<path
-				stroke="currentColor"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				strokeWidth="2"
-				d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-			/>
-		</svg>
-	);
-};

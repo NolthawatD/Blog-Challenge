@@ -2,12 +2,15 @@
 
 import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
-import Image from "next/image";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
-export default function SearchBar() {
+interface SearchBarProps {
+	setBlogs: React.Dispatch<React.SetStateAction<any[]>>;
+}
+
+export default function SearchBar({ setBlogs }: SearchBarProps) {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -27,7 +30,7 @@ export default function SearchBar() {
 
 	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
 
-	const [blogs, setBlogs] = useState([]);
+	const pathName = usePathname();
 	const [communities, setCommunities] = useState([]);
 	const [searchInput, setSearchInput] = useState("");
 	const [communitySelect, setCommunitySelect] = useState<number[]>([]);
@@ -37,7 +40,8 @@ export default function SearchBar() {
 	const [communityNameCreate, setCommunityNameCreate] = useState<string>("");
 	const [newTitle, setNewTitle] = useState("");
 	const [newContent, setNewContent] = useState("");
-	const [authorId, setAuthorId] = useState(0);
+	const [authorId, setAuthorId] = useState<number | null>(null);
+
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation(
@@ -49,23 +53,6 @@ export default function SearchBar() {
 			},
 		}
 	);
-
-	const handleCommunityCreate = (communityId: number, communityName: string) => {
-		setCommunityIdCreate(communityId);
-		setCommunityNameCreate(communityName);
-		setDropdownOpenModal(false);
-	};
-
-	const handleToggleModalCreate = () => {
-		setToggleModalCreate(!toggleModalCreate);
-		if (toggleModalCreate === false) {
-			setCommunityIdCreate(0);
-			setCommunityNameCreate("");
-			setNewTitle("");
-			setNewContent("");
-		}
-		blogRefetch();
-	};
 
 	useEffect(() => {
 		const _authorId = localStorage.getItem("userId");
@@ -121,10 +108,10 @@ export default function SearchBar() {
 		error: blogError,
 		refetch: blogRefetch,
 	} = useQuery(
-		"blogs",
+		["blogs", authorId, searchInput, communitySelect],
 		() =>
 			fetchData("post", {
-				authorId: "",
+				authorId: pathName === "/our-blog" ? authorId : null,
 				title: searchInput,
 				content: "",
 				communityId: JSON.stringify(communitySelect),
@@ -148,6 +135,30 @@ export default function SearchBar() {
 	useEffect(() => {
 		blogRefetch();
 	}, [searchInput, communitySelect]);
+
+	useEffect(() => {
+		if (pathName === "/our-blog") {
+			console.log("%c === ", "color:red", "  pathName", pathName);
+			blogRefetch();
+		}
+	}, [pathName]);
+
+	const handleCommunityCreate = (communityId: number, communityName: string) => {
+		setCommunityIdCreate(communityId);
+		setCommunityNameCreate(communityName);
+		setDropdownOpenModal(false);
+	};
+
+	const handleToggleModalCreate = () => {
+		setToggleModalCreate(!toggleModalCreate);
+		if (toggleModalCreate === false) {
+			setCommunityIdCreate(0);
+			setCommunityNameCreate("");
+			setNewTitle("");
+			setNewContent("");
+		}
+		blogRefetch();
+	};
 
 	return (
 		<div>
