@@ -31,7 +31,7 @@ const Topbar = () => {
 							<h3 className="text-white font-semibold">Sign in</h3>
 						</div>
 					): (
-						<p className="text-white font-san mr-20 py-2">{username}</p>
+						<p className="text-white font-san mr-20 py-2 hidden md:block">{username}</p>
 					)}
 
 					{/* Toggle */}
