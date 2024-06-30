@@ -7,6 +7,7 @@ import { CommentModule } from "./comment/comment.module";
 import { EventsModule } from "./events/events.module";
 import { RouterModule } from "@nestjs/core";
 import { EventsGateway } from "./events/events.gateway";
+import { CommunityModule } from './community/community.module';
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { EventsGateway } from "./events/events.gateway";
 		PostModule,
 		CommentModule,
 		EventsModule,
+		CommunityModule,
 	],
 	providers: [GlobalService, EventsGateway],
 	exports: [GlobalService],

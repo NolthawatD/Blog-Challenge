@@ -1,31 +1,14 @@
-import { useQuery } from "react-query";
+import { useQuery } from 'react-query';
+import { fetchData } from './fetch';
 
-const fetchData = async (url: string, body: unknown) => {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-
-  return response.json();
-};
-
-export function useFetchData(url: string, options = {}, body: unknown, enabled = true) {
-	return useQuery(
-		[url], 
-		() => fetchData(url, body),
-		{
-			enabled: enabled,
-			refetchOnWindowFocus: false,
-			retry: 2,
-			...options,
-			
-		}
-	);
+export function useFetchData(query: string, options = {}) {
+  return useQuery(
+    [query],
+    () => fetchData(query),
+    {
+      refetchOnWindowFocus: false,
+      retry: 2,
+      ...options,
+    }
+  );
 }
