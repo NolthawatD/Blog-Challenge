@@ -121,7 +121,6 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 			}),
 		{
 			onSuccess: (data) => {
-				console.log("%c === ", "color:cyan", "  data", data?.data?.result);
 				setBlogs(data?.data?.result);
 			},
 		}

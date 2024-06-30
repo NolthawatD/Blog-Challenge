@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface ContentBlogProps {
 	blogs: any[];
@@ -12,6 +14,12 @@ interface ContentBlogProps {
 
 export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdit }: ContentBlogProps) {
 	const pathName = usePathname();
+	const router = useRouter();
+
+	const handleShowDetail = (blog: any) => {
+		router.push(`/blog/${blog?.id}`)
+	};
+
 	return (
 		<div>
 			{/* Content */}
@@ -19,7 +27,11 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 				<div className="pl-0 py-5 md:pr-60">
 					<div className="bg-white rounded-lg shadow-md">
 						{blogs?.map((blog: any) => (
-							<div className="container mx-auto" key={blog?.id + Math.random()}>
+							<div
+								className="container mx-auto hover:bg-gray-50 hover:cursor-pointer"
+								key={blog?.id + Math.random()}
+								onClick={() => handleShowDetail(blog)}
+							>
 								<div className="flex flex-row flex-wrap py-4">
 									<aside className="w-full px-2 ">
 										<div className="sticky top-0 p-4 w-fullrounded-lg">
