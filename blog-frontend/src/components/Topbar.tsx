@@ -1,12 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const Topbar = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [username, setUsername] = useState<string | null>(null);
 	const router = useRouter();
+
+	useEffect(() => {
+		const username = localStorage.getItem("username");
+		if (username) {
+			setUsername(username);
+		}
+	}, []);
 
 	return (
 		<nav className="bg-green-500 p-4 fixed left-0 w-full z-10">
@@ -15,12 +23,16 @@ const Topbar = () => {
 					<Image width={80} height={25} alt="icon" src="/assets/image/a-board.svg" />
 				</div>
 				<div>
-					<div
-						className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb"
-						onClick={() => router.push("/dashboard")}
-					>
-						<h3 className="text-white font-semibold">Sign in</h3>
-					</div>
+					{!username ? (
+						<div
+							className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb"
+							onClick={() => router.push("/dashboard")}
+						>
+							<h3 className="text-white font-semibold">Sign in</h3>
+						</div>
+					): (
+						<p className="text-white font-san mr-20 py-2">{username}</p>
+					)}
 
 					{/* Toggle */}
 					<div className="md:hidden">
