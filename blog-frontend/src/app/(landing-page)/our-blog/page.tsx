@@ -32,7 +32,7 @@ export default function OurBlog() {
 				handleToggleEdit={handleToggleEdit} 
 			/>
 			{toggleModalEdit && 
-				<ModalEdit handleToggleEdit={handleToggleEdit} />
+				<ModalEdit handleToggleEdit={handleToggleEdit} blogEdit={blogEdit}/>
 			}
 			{toggleModalRemove && 
 				<ModalRemove handleToggleRemove={handleToggleRemove} blogRemoveId={blogRemoveId}/>

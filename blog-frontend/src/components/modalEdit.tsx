@@ -1,24 +1,70 @@
-"use-client"
+"use-client";
 
-import React, { useState } from "react";
+import { backendAPI } from "@/hooks/apiConfig";
+import { fetchData } from "@/hooks/fetch";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 
 interface ModalEditProps {
 	handleToggleEdit: (blogEdit: any) => void;
+	blogEdit: any;
 }
 
-export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
+async function editBlog(blogId: number, blog: {}) {
+	const response = await fetch(`${backendAPI}/post/${blogId}`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(blog),
+	});
+
+	if (!response.ok) {
+		throw new Error("Network response was not ok");
+	}
+
+	return response.json();
+}
+
+export function ModalEdit({ handleToggleEdit, blogEdit }: ModalEditProps) {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
-	const [selectedCommunity, setSelectedCommunity] = useState("");
-	const [toggleModalRemove, setToggleModalRemove] = useState(false)
+	const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>();
+	const [selectedCommunityName, setSelectedCommunityName] = useState<string>("");
+	const [communities, setCommunities] = useState([]);
+	const [editTitle, setEditTitle] = useState<string | undefined>("");
+	const [editContent, setEditContent] = useState<string | undefined>("");
 
 	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
-	const handleCommunitySelect = (community: string) => {
-		setSelectedCommunity(community);
+	const handleCommunitySelect = (communityId: number, communityName: string) => {
+		setSelectedCommunityId(communityId);
+		setSelectedCommunityName(communityName);
 		setDropdownOpenModal(false);
 	};
 
-	const [communities, setCommunities] = useState([]);
+	useEffect(() => {
+		setEditTitle(blogEdit?.title);
+		setEditContent(blogEdit?.content);
+	}, [blogEdit]);
+
+	const {
+		data: communityData,
+		isLoading: communityIsLoading,
+		error: communityError,
+	} = useQuery("communities", () => fetchData("community"), {
+		onSuccess: (data) => {
+			setCommunities(data.datas);
+		},
+	});
+
+	const handleEditBlog = async () => {
+		const _blogEdit = {
+			title: editTitle,
+			content: editContent,
+		};
+		await editBlog(blogEdit?.id, _blogEdit);
+		handleToggleEdit(undefined)
+	};
 
 	return (
 		<div>
@@ -63,7 +109,7 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 								type="button"
 								className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
 							>
-								{selectedCommunity || "Choose a community"}
+								{selectedCommunityName || "Choose a community"}
 								<svg
 									className="w-4 h-4 ml-2"
 									fill="none"
@@ -78,16 +124,16 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 							{dropdownOpenModal && (
 								<div className="relative">
 									<ul className="absolute z-10 w-full py-2 mt-1 bg-white rounded-md shadow-lg">
-										{communities.map((community) => (
-											<li key={community}>
+										{communities?.map((community: any) => (
+											<li key={community?.name + Math.random().toString()}>
 												<button
-													onClick={() => handleCommunitySelect(community)}
+													onClick={() => handleCommunitySelect(community?.id, community?.name)}
 													className={`flex justify-between items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 ${
-														selectedCommunity === community ? "bg-green-50" : ""
+														selectedCommunityId === community?.id ? "bg-green-50" : ""
 													}`}
 												>
-													<span>{community}</span>
-													{selectedCommunity === community && (
+													<span>{community?.name}</span>
+													{selectedCommunityId === community?.id && (
 														<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
 															<path
 																fillRule="evenodd"
@@ -108,6 +154,8 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 							id="title"
 							className="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 							placeholder="Title"
+							value={editTitle}
+							onChange={(e) => setEditTitle(e.target.value)}
 						/>
 
 						<textarea
@@ -115,6 +163,8 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 							rows={10}
 							className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 							placeholder="What's on your mind..."
+							value={editContent}
+							onChange={(e) => setEditContent(e.target.value)}
 						></textarea>
 
 						<div className="flex flex-col-reverse sm:flex-row sm:justify-end items-center space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4 mt-6">
@@ -127,9 +177,9 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 									Cancel
 								</button>
 							</div>
-							<div className="w-80 sm:w-auto">
+							<div className="w-80 sm:w-auto" onClick={() => handleEditBlog()}>
 								<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-custom-success text-white rounded-md">
-									Post
+									Confirm
 								</button>
 							</div>
 						</div>
@@ -138,6 +188,6 @@ export function ModalEdit({ handleToggleEdit }: ModalEditProps) {
 			</div>
 		</div>
 	);
-};
+}
 
 export default ModalEdit;
