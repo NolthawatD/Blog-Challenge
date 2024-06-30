@@ -39,6 +39,7 @@ export class PostService extends BaseService {
 	}
 
 	async findAll(query: FindAllPostsDto) {
+		console.log("%c === ", "color:cyan", "  query", query);
 		console.log("Service: find all post");
 		const whereCause = {
 			title: {
@@ -50,6 +51,7 @@ export class PostService extends BaseService {
 				mode: "insensitive",
 			},
 			author_id: query?.authorId > 0 ? query?.authorId : undefined,
+			community_id: query?.communityId?.length > 0 ? { in: JSON.parse(query?.communityId) } : undefined,
 			is_deleted: false,
 		};
 
@@ -115,16 +117,15 @@ export class PostService extends BaseService {
 				},
 				data: {
 					is_deleted: true,
-				}
+				},
 			});
 
-			const result = { message: "Post's deleted complete" , is_deleted: true}
+			const result = { message: "Post's deleted complete", is_deleted: true };
 			if (!updatePost) {
-				result.message = "Post's deleted incomplete"
-				result.is_deleted = false
+				result.message = "Post's deleted incomplete";
+				result.is_deleted = false;
 			}
 			return sendResponse(result, HttpStatus.OK);
-			
 		} catch (error) {
 			return sendError(error.status, error.message ? error.message : "Something went wrong.");
 		}

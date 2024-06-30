@@ -1,8 +1,17 @@
 import { backendAPI } from "./apiConfig";
 
-export const fetchData = async (query: string) => {
-	const url = `${backendAPI}/${query}`;
-	console.log(`HOOK: useFectData url: ${url}`);
+export const fetchData = async (routeName: string, queryParams: any = {}) => {
+	const url = new URL(backendAPI + "/" + routeName);
+	const params = new URLSearchParams(queryParams);
+
+	if (queryParams.communityId) {
+		// queryParams.communityId.forEach((id: any) => params.append("communityId", id));
+	}
+	console.log("%c === ","color:cyan","  queryParams", queryParams);
+
+	url.search = params.toString();
+	console.log(`HOOK: fetchData url: ${url}`);
+
 	const response = await fetch(url, {
 		method: "GET",
 		headers: {

@@ -1,7 +1,6 @@
 "use client";
 
 import { fetchData } from "@/hooks/fetch";
-import { useFetchData } from "@/hooks/useFetchData";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
@@ -10,6 +9,11 @@ export default function Home() {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [selectedItem, setSelectedItem] = useState<string | null>(null);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
+	const [searchInput, setSearchInput] = useState("");
+
+	const handleItemClick = (item: string) => {
+		setSelectedItem(item);
+	};
 
 	const toggleDropdown = () => {
 		setDropdownOpen(!dropdownOpen);
@@ -28,9 +32,6 @@ export default function Home() {
 
 	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
 
-	const handleItemClick = (item: string) => {
-		setSelectedItem(item);
-	};
 	const handleCommunitySelect = (community: string) => {
 		setSelectedCommunity(community);
 		setDropdownOpenModal(false);
@@ -38,6 +39,17 @@ export default function Home() {
 
 	const [blogs, setBlogs] = useState([]);
 	const [communities, setCommunities] = useState([]);
+	const [communitySelect, setCommunitySelect] = useState<number[]>([]);
+
+	const handleCommunity = (comId: number) => {
+		setCommunitySelect((prevCommunitySelect) => {
+			if (prevCommunitySelect.includes(comId)) {
+				return prevCommunitySelect.filter((id) => id !== comId);
+			} else {
+				return [...prevCommunitySelect, comId];
+			}
+		});
+	};
 
 	const {
 		data: communityData,
@@ -49,22 +61,40 @@ export default function Home() {
 		},
 	});
 	// Blog query
+
 	const {
 		data: blogData,
 		isLoading: blogIsLoading,
 		error: blogError,
-	} = useQuery("blogs", () => fetchData("post?authorId=&title=Nol&content=&page=1&limit=10"), {
-		onSuccess: (data) => {
-			console.log("%c === ", "color:cyan", "  data", data.data.result);
-			setBlogs(data.data.result);
-		},
-	});
+		refetch: blogRefetch,
+	} = useQuery(
+		"blogs",
+		() =>
+			fetchData("post", {
+				authorId: "",
+				title: searchInput,
+				content: "",
+				communityId: JSON.stringify([1, 2]),
+				page: 1,
+				limit: 10,
+			}),
+		{
+			onSuccess: (data) => {
+				console.log("%c === ", "color:cyan", "  data", data?.data?.result);
+				setBlogs(data?.data?.result);
+			},
+		}
+	);
 
 	useEffect(() => {
 		if (!communityIsLoading && !blogIsLoading) {
 			console.log("Both queries are complete");
 		}
 	}, [communityIsLoading, blogIsLoading]);
+
+	useEffect(() => {
+		blogRefetch();
+	}, [searchInput]);
 
 	return (
 		<div>
@@ -94,6 +124,7 @@ export default function Home() {
 								required
 								onBlur={handleSearchBlur}
 								autoFocus
+								onChange={(e: any) => setSearchInput(e.target.value)}
 							/>
 						)}
 
@@ -104,6 +135,7 @@ export default function Home() {
 							className="hidden sm:block w-full p-3 ps-10 bg-custom-page-bg text-sm text-black border border-gray-300 rounded-lg"
 							placeholder="Search"
 							required
+							onChange={(e: any) => setSearchInput(e.target.value)}
 						/>
 					</div>
 
@@ -138,16 +170,16 @@ export default function Home() {
 								>
 									<ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
 										{communities?.map((community: any) => (
-											<li className="flex items-center justify-between">
+											<li className="flex items-center justify-between" key={community.name}>
 												<button
-													onClick={() => handleItemClick(community.name)}
+													onClick={() => handleCommunity(community.id)}
 													className={`block px-4 py-2 items-center ${
-														selectedItem === community.name ? "font-medium text-black" : ""
+														communitySelect.includes(community.id) ? "font-medium text-black" : ""
 													}`}
 												>
 													{community.name}
 												</button>
-												{selectedItem === community.name && <TrueSign />}
+												{communitySelect.includes(community.id) && <TrueSign />}
 											</li>
 										))}
 									</ul>
@@ -165,41 +197,41 @@ export default function Home() {
 
 			{/* Content */}
 			<div className="md:px-0 px-4">
-			<div className="pl-0 py-5 md:pr-60">
-			<div className="bg-white rounded-lg shadow-md border-b-2">
-				{blogs?.map((blog: any) => (
-					<div className="container mx-auto" key={blog?.id + Math.random()}>
-						<div className="flex flex-row flex-wrap py-4">
-							<aside className="w-full px-2 ">
-								<div className="sticky top-0 p-4 w-fullrounded-lg">
-									<div className="flex items-center mb-4">
-										<Image
-											className="rounded-full w-10 h-10 me-3"
-											width={50}
-											height={50}
-											alt="icon"
-											src="/assets/image/default.png"
-										/>
-										<p className="text-header">{blog?.author?.username}</p>
-									</div>
-									<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
-										<span className="text-slate-700	">{blog?.community?.name}</span>
-									</div>
-									<h2 className="text-3xl	font-medium	mt-3">{blog?.title}</h2>
-									<ul className="flex flex-col overflow-hidden rounded-lg">{blog?.content?.slice(0, 500) + "..."}</ul>
-									<div className="flex items-center mt-2 ">
-										<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
-										<span className="me-2 text-span">{blog?.comments?.length}</span>
-										<span className="text-span">Comments</span>
-									</div>
+				<div className="pl-0 py-5 md:pr-60">
+					<div className="bg-white rounded-lg shadow-md border-b-2">
+						{blogs?.map((blog: any) => (
+							<div className="container mx-auto" key={blog?.id + Math.random()}>
+								<div className="flex flex-row flex-wrap py-4">
+									<aside className="w-full px-2 ">
+										<div className="sticky top-0 p-4 w-fullrounded-lg">
+											<div className="flex items-center mb-4">
+												<Image
+													className="rounded-full w-10 h-10 me-3"
+													width={50}
+													height={50}
+													alt="icon"
+													src="/assets/image/default.png"
+												/>
+												<p className="text-header">{blog?.author?.username}</p>
+											</div>
+											<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
+												<span className="text-slate-700	">{blog?.community?.name}</span>
+											</div>
+											<h2 className="text-3xl	font-medium	mt-3">{blog?.title}</h2>
+											<ul className="flex flex-col overflow-hidden rounded-lg">{blog?.content?.slice(0, 500) + "..."}</ul>
+											<div className="flex items-center mt-2 ">
+												<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
+												<span className="me-2 text-span">{blog?.comments?.length}</span>
+												<span className="text-span">Comments</span>
+											</div>
+										</div>
+									</aside>
 								</div>
-							</aside>
-						</div>
-						<hr className="h-px  bg-gray-400 border-0 dark:bg-gray-700" />
+								<hr className="h-px  bg-gray-400 border-0 dark:bg-gray-700" />
+							</div>
+						))}
 					</div>
-				))}
-			</div>
-		</div>
+				</div>
 			</div>
 
 			<div className="hidden">
@@ -320,11 +352,10 @@ export default function Home() {
 	);
 }
 
-
 const TrueSign = () => {
 	return (
 		<svg className="w-4 h-4 ml-2 mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
 		</svg>
 	);
 };
@@ -340,7 +371,7 @@ const SearchSign = ({ propClass }: { propClass: string }) => {
 		>
 			<path
 				stroke="currentColor"
-				stroke-linecap="round"
+				strokeLinecap="round"
 				strokeLinejoin="round"
 				strokeWidth="2"
 				d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"

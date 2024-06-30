@@ -1,17 +1,16 @@
-import { IsInt, IsOptional, IsString, validate, validateOrReject } from "@nestjs/class-validator";
-import { Min } from "class-validator";
+import { IsArray, IsInt, IsOptional, IsString, validate, validateOrReject } from "@nestjs/class-validator";
 import { PaginationDto } from "src/common/dto/pagination";
 
 export class FindAllPostsDto extends PaginationDto {
   @IsOptional()
-  @IsString()
-  title?: string;
+  title?: string | null;
 
   @IsOptional()
-  @IsString()
   content?: string;
 
 	@IsOptional()
-  @IsInt()
   authorId?: number;
+
+  @IsOptional()
+  communityId?: string;
 }
