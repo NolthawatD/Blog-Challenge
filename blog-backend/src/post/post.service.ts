@@ -17,6 +17,7 @@ export class PostService extends BaseService {
 
 	public async create(data: CreatePostDto) {
 		console.log("Service: create post");
+		console.log("%c === ","color:cyan","  data", data);
 		try {
 			if (!data.title) throw new BadRequestException("title's required");
 			if (!data.content) throw new BadRequestException("content's required");

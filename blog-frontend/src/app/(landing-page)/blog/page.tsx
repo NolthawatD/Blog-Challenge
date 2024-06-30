@@ -1,9 +1,11 @@
 "use client";
 
 import { fetchData } from "@/hooks/fetch";
+import { mutationData } from "@/hooks/mutation";
 import Image from "next/image";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 
 export default function Home() {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,10 +25,8 @@ export default function Home() {
 	};
 
 	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
-	const [selectedCommunity, setSelectedCommunity] = useState("");
 
 	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
-
 
 	const [blogs, setBlogs] = useState([]);
 	const [communities, setCommunities] = useState([]);
@@ -35,11 +35,65 @@ export default function Home() {
 	const [toggleModalCreate, setToggleModalCreate] = useState(false);
 	const [communityIdCreate, setCommunityIdCreate] = useState<number>(0);
 	const [communityNameCreate, setCommunityNameCreate] = useState<string>("");
+	const [newTitle, setNewTitle] = useState("");
+	const [newContent, setNewContent] = useState("");
+	const [authorId, setAuthorId] = useState(0);
+	const queryClient = useQueryClient();
+
+
+	const mutation = useMutation(
+		async () => await mutationData("post", { title: newTitle, content: newContent, authorId: authorId, communityId: communityIdCreate }),
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries("post");
+				blogRefetch()
+			},
+		}
+	);
 
 	const handleCommunityCreate = (communityId: number, communityName: string) => {
 		setCommunityIdCreate(communityId);
-		setCommunityNameCreate(communityName)
+		setCommunityNameCreate(communityName);
 		setDropdownOpenModal(false);
+	};
+
+	const handleToggleModalCreate = () => {
+		setToggleModalCreate(!toggleModalCreate);
+		if (toggleModalCreate === false) {
+			setCommunityIdCreate(0);
+			setCommunityNameCreate("");
+			setNewTitle("");
+			setNewContent("");
+		}
+	};
+
+	useEffect(() => {
+		const _authorId = localStorage.getItem("userId");
+		setAuthorId(Number(_authorId));
+	}, [])
+	
+	const handleCreateNewPost = () => {
+		
+		if (!communityNameCreate) {
+			alert("Please choose community");
+			return;
+		}
+		if (!newTitle) {
+			alert("Please enter title");
+			return;
+		}
+		if (!newContent) {
+			alert("Plese enter content");
+			return;
+		}
+		if (!authorId) {
+			alert("Please sign in before");
+			return;
+		}
+
+		mutation.mutate();
+
+		handleToggleModalCreate();
 	};
 
 	const handleCommunityQuery = (comId: number) => {
@@ -192,7 +246,7 @@ export default function Home() {
 							<button
 								type="submit"
 								className="text-white bg-custom-success font-medium rounded-lg text-sm px-6 py-3"
-								onClick={() => setToggleModalCreate(!toggleModalCreate)}
+								onClick={() => handleToggleModalCreate()}
 							>
 								Create+
 							</button>
@@ -260,7 +314,7 @@ export default function Home() {
 									type="button"
 									className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
 									data-modal-toggle="crud-modal"
-									onClick={() => setToggleModalCreate(!toggleModalCreate)}
+									onClick={() => handleToggleModalCreate()}
 								>
 									<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
 										<path
@@ -274,7 +328,7 @@ export default function Home() {
 								</button>
 							</div>
 
-							<form className="p-6">
+							<div className="p-6">
 								{/* Community selection dropdown */}
 								<div className="mb-4">
 									<button
@@ -283,7 +337,7 @@ export default function Home() {
 										type="button"
 										className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
 									>
-										{ communityNameCreate || "Choose a community"}
+										{communityNameCreate || "Choose a community"}
 										<svg
 											className="w-4 h-4 ml-2"
 											fill="none"
@@ -307,7 +361,7 @@ export default function Home() {
 															}`}
 														>
 															<span>{community.name}</span>
-															{communityIdCreate === community.id  && (
+															{communityIdCreate === community.id && (
 																<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
 																	<path
 																		fillRule="evenodd"
@@ -328,6 +382,7 @@ export default function Home() {
 									id="title"
 									className="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 									placeholder="Title"
+									onChange={(e: any) => setNewTitle(e.target.value)}
 								/>
 
 								<textarea
@@ -335,6 +390,7 @@ export default function Home() {
 									rows={10}
 									className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
 									placeholder="What's on your mind..."
+									onChange={(e: any) => setNewContent(e.target.value)}
 								></textarea>
 
 								<div className="flex flex-col-reverse sm:flex-row sm:justify-end items-center space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4 mt-6">
@@ -342,17 +398,22 @@ export default function Home() {
 										<button
 											type="button"
 											className="w-full sm:w-32 px-4 sm:px-6 py-2 rounded-md border border-custom-success text-custom-success"
+											onClick={() => handleToggleModalCreate()}
 										>
 											Cancel
 										</button>
 									</div>
 									<div className="w-80 sm:w-auto">
-										<button type="submit" className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-custom-success text-white rounded-md">
+										<button
+											type="submit"
+											className="w-full sm:w-32 px-4 sm:px-6 py-2 bg-custom-success text-white rounded-md"
+											onClick={() => handleCreateNewPost()}
+										>
 											Post
 										</button>
 									</div>
 								</div>
-							</form>
+							</div>
 						</div>
 					</div>
 				</div>
