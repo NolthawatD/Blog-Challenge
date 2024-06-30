@@ -147,76 +147,66 @@ export default function Home() {
 
 			<div>
 				{/* <!-- Backdrop --> */}
-				<div id="modal-backdrop" className="fixed inset-0 bg-black bg-opacity-70"></div>
+				<div id="modal-backdrop" className="fixed inset-0 bg-black bg-opacity-50"></div>
 
 				{/* <!-- Main modal --> */}
 				<div
 					id="crud-modal"
 					tabIndex={-1}
 					aria-hidden="true"
-					className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full mr-10 mt-32 pb-20"
+					className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-3xl "
 				>
-					<div className="relative p-4 w-full max-w-md max-h-full">
-						{/* <!-- Modal content --> */}
-						<div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-							{/* <!-- Modal header --> */}
-							<div className="flex items-center justify-between px-4  pt-4 md:p-5">
-								<h3 className="text-lg font-semibold text-gray-900 dark:text-white">Create Post</h3>
+					<div className="relative bg-white rounded-lg shadow-xl sm:mx-0 mx-4">
+						{/* <!-- Modal header --> */}
+						<div className="flex items-center justify-between p-6 border-b">
+							<h3 className="text-xl font-semibold text-gray-900">Create Post</h3>
+							<button
+								type="button"
+								className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+								data-modal-toggle="crud-modal"
+							>
+								<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+									<path
+										stroke="currentColor"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+										d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+									/>
+								</svg>
+							</button>
+						</div>
+
+						<form className="p-6">
+							{/* Community selection dropdown */}
+							<div className="mb-4">
 								<button
+									id="communityDropdown"
+									onClick={toggleDropdownModal}
 									type="button"
-									className="text-gray-700 bg-transparent rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-									data-modal-toggle="crud-modal"
+									className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
 								>
-									<svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-										/>
+									{selectedCommunity || "Choose a community"}
+									<svg
+										className="w-4 h-4 ml-2"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 									</svg>
 								</button>
-							</div>
 
-							{/* Community selection dropdown */}
-							<div className="px-4 mb-4">
-								<label htmlFor="community" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-									Choose a community
-								</label>
-								<div className="relative">
-									<button
-										id="communityDropdown"
-										onClick={toggleDropdownModal}
-										type="button"
-										className="w-full bg-white border border-green-600 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-green-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-									>
-										{selectedCommunity || "Select a community"}
-										<svg
-											className="w-4 h-4 ml-2 absolute right-2.5 top-1/2 transform -translate-y-1/2"
-											aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 10 6"
-										>
-											<path
-												stroke="currentColor"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth="1"
-												d="m1 1 4 4 4-4"
-											/>
-										</svg>
-									</button>
-
-									{dropdownOpenModal && (
-										<ul className="absolute z-10 w-full py-2 mt-1 bg-white rounded-md shadow-lg dark:bg-gray-700">
+								{dropdownOpenModal && (
+									<div className="relative">
+										<ul className="absolute z-10 w-full py-2 mt-1 bg-white rounded-md shadow-lg">
 											{communities.map((community) => (
 												<li key={community}>
 													<button
 														onClick={() => handleCommunitySelect(community)}
-														className={`flex justify-between items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 ${
-															selectedCommunity === community ? "bg-green-100 dark:bg-gray-600" : ""
+														className={`flex justify-between items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 ${
+															selectedCommunity === community ? "bg-green-50" : ""
 														}`}
 													>
 														<span>{community}</span>
@@ -233,47 +223,32 @@ export default function Home() {
 												</li>
 											))}
 										</ul>
-									)}
-								</div>
+									</div>
+								)}
 							</div>
 
-							{/* <!-- Modal body --> */}
-							<form className="p-4 md:p-5">
-								<div className="grid gap-4 mb-4 grid-cols-2">
-									<div className="col-span-2">
-										<input
-											id="title"
-											className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="Title"
-										></input>
-									</div>
-								</div>
+							<input
+								id="title"
+								className="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
+								placeholder="Title"
+							/>
 
-								<div className="grid gap-4 mb-4 grid-cols-2">
-									<div className="col-span-2">
-										<textarea
-											id="description"
-											rows={4}
-											className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-											placeholder="What's on your mind?"
-										></textarea>
-									</div>
-								</div>
+							<textarea
+								id="description"
+								rows={10}
+								className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
+								placeholder="What's on your mind..."
+							></textarea>
 
-								<div className="flex flex-col items-center space-y-2 pt-2">
-									<div className="flex w-full">
-										<button className="w-full bg-white border border-green-600 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-green-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
-											Cancel
-										</button>
-									</div>
-									<div className="flex w-full">
-										<button className="w-full bg-custom-success border-transparent text-white focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-green-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
-											Post
-										</button>
-									</div>
-								</div>
-							</form>
-						</div>
+							<div className="flex justify-end space-x-4 mt-6">
+								<button type="button" className="px-6 py-2 border border-custom-success text-custom-success rounded-md hover:bg-green-50">
+									Cancel
+								</button>
+								<button type="submit" className="px-6 py-2 bg-custom-success text-white rounded-md hover:bg-custom-success">
+									Post
+								</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
