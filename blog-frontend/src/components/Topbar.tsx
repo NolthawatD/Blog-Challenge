@@ -2,14 +2,11 @@
 
 import Image from "next/image";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Topbar = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-	const toggleMenu = () => {
-		console.log("Hey");
-		setIsMenuOpen(!isMenuOpen);
-	};
+	const router = useRouter();
 
 	return (
 		<nav className="bg-green-500 p-4 fixed left-0 w-full z-10">
@@ -18,13 +15,16 @@ const Topbar = () => {
 					<Image width={80} height={25} alt="icon" src="/assets/image/a-board.svg" />
 				</div>
 				<div>
-					<div className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb">
+					<div
+						className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb"
+						onClick={() => router.push("/dashboard")}
+					>
 						<h3 className="text-white font-semibold">Sign in</h3>
 					</div>
 
 					{/* Toggle */}
 					<div className="md:hidden">
-						<button id="menu-toggle" className="text-white py-2" onClick={toggleMenu}>
+						<button id="menu-toggle" className="text-white py-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
 							{isMenuOpen ? (
 								<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
 									<path d="M18 12l-6 6M18 12l-6-6"></path> {/* Right arrow for collapsing */}
@@ -45,7 +45,7 @@ const Topbar = () => {
 					isMenuOpen ? "translate-x-0" : "translate-x-full"
 				}`}
 			>
-				<button className="absolute top-4 left-4 text-white mt-10" onClick={toggleMenu}>
+				<button className="absolute top-4 left-4 text-white mt-10" onClick={() => setIsMenuOpen(!isMenuOpen)}>
 					<Image width={20} height={25} alt="icon" src="/assets/image/ribbon-arrow.svg" />
 				</button>
 				<ul className="py-2 text-sm text-white dark:text-gray-200 mt-10 mx-3" aria-labelledby="dropdownDefaultButton">
@@ -70,11 +70,3 @@ const Topbar = () => {
 };
 
 export default Topbar;
-
-const TrueSign = () => {
-	return (
-		<svg className="w-4 h-4 ml-2 mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-		</svg>
-	);
-};

@@ -7,7 +7,7 @@ import { Response } from 'express';
 export class AccountController {
 	constructor(private readonly accountService: AccountService) {}
 
-	@Post()
+	@Post("/signIn")
 	async sigIn(
 		@Body() createTestDto: CreateAccountDto, 
 		@Res({ passthrough: true }) res: Response,
