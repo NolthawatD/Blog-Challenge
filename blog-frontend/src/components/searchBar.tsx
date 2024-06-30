@@ -3,7 +3,7 @@
 import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 interface SearchBarProps {
@@ -11,8 +11,9 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ setBlogs }: SearchBarProps) {
-	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const toggleDropdown = () => {
 		setDropdownOpen(!dropdownOpen);
@@ -159,6 +160,20 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 		blogRefetch();
 	};
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setDropdownOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
 	return (
 		<div>
 			<div className="pl-0 pr-10 md:pr-60 py-5 mt-7">
@@ -207,7 +222,7 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 					{!isSearchFocused && (
 						<>
 							{/* Dropdown */}
-							<div className="relative">
+							<div className="relative" ref={dropdownRef}>
 								<button
 									id="dropdownDefaultButton"
 									onClick={toggleDropdown}
@@ -237,13 +252,21 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 											<li className="flex items-center justify-between" key={community.name}>
 												<button
 													onClick={() => handleCommunityQuery(community.id)}
-													className={`block px-4 py-2 items-center ${
-														communitySelect.includes(community.id) ? "font-medium text-black" : ""
+													className={`flex justify-between items-center w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 ${
+														communitySelect.includes(community.id) ? "bg-green-50" : ""
 													}`}
 												>
 													{community.name}
+													{communitySelect.includes(community.id) && (
+														<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+															<path
+																fillRule="evenodd"
+																d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+																clipRule="evenodd"
+															/>
+														</svg>
+													)}
 												</button>
-												{communitySelect.includes(community.id) && <TrueSign />}
 											</li>
 										))}
 									</ul>
@@ -302,7 +325,9 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 								<div className="mb-4">
 									<button
 										id="communityDropdown"
-										onClick={toggleDropdownModal}
+										onClick={() => {
+											toggleDropdownModal(), setDropdownOpen(!dropdownOpen);
+										}}
 										type="button"
 										className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
 									>
