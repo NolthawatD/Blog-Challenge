@@ -68,7 +68,10 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 											<h2 className="text-3xl	font-medium	mt-3 hover:cursor-pointer" onClick={() => handleShowDetail(blog?.id)}>
 												{blog?.title}
 											</h2>
-											<ul className="flex flex-col overflow-hidden rounded-lg">{blog?.content?.slice(0, 500) + "...text"}</ul>
+											<ul className="flex flex-col overflow-hidden rounded-lg">
+												{blog?.content?.slice(0, 320)}
+												{blog?.content?.length > 320 && "..."}
+											</ul>
 											<div className="flex items-center mt-2 ">
 												<Image width={25} height={25} alt="icon" src="/assets/image/message-circle-02.svg" />
 												<span className="me-2 text-span">{blog?.comments?.length}</span>
