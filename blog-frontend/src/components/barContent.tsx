@@ -208,7 +208,6 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			});
 
 			socket.on("allSignIn", (events) => {
-				// console.log("All sign-in events:", events);
 				setSignInList(events);
 			});
 
@@ -221,7 +220,6 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			});
 
 			if (authorId) {
-				console.log("%c === ", "color:cyan", "  authorId", authorId);
 				socket.emit("signIn", authorId);
 			}
 		}
@@ -229,10 +227,8 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			if (socket) {
 				socket.off("connect");
 				socket.off("disconnect");
-				socket.off("pong");
 				socket.off("allSignIn");
 				socket.off("newSignIn");
-				socket.off("clientDisconnected");
 			}
 		};
 	}, [socket]);

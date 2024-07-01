@@ -83,7 +83,10 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 												>
 													{blog?.title}
 												</h2>
-												<ul className="flex flex-col overflow-hidden rounded-lg">
+												<ul
+													className="flex flex-col overflow-hidden rounded-lg hover:cursor-pointer"
+													onClick={() => handleShowDetail(blog?.id)}
+												>
 													{blog?.content?.slice(0, 320)}
 													{blog?.content?.length > 320 && "..."}
 												</ul>
