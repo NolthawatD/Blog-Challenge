@@ -1,6 +1,7 @@
 "use client";
 
 import { useSignIn } from "@/hooks/useSignIn";
+import Image from "next/image";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -32,8 +33,21 @@ const SignIn = () => {
 		<div className="flex flex-col lg:flex-row h-screen bg-green-500 lg:bg-green-300">
 			{/* Right side (a Board) */}
 			<div className="flex-1 flex items-center justify-center p-4 lg:p-8 bg-green-300 lg:bg-green-500 lg:rounded-tl-3xl lg:rounded-bl-3xl rounded-bl-3xl rounded-br-3xl lg:rounded-br-none">
-				<div className="text-white text-center lg:text-left">
-					<h1 className="text-4xl font-bold">a Board</h1>
+				<div className="text-white text-center justify-items-center lg:text-center">
+					<Image
+						className="w-32 h-30 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-80 lg:h-64 mx-auto"
+						width={299.61}
+						height={230}
+						alt="icon"
+						src="/assets/image/signIn.png"
+					/>
+					<Image
+						className="w-20 h-30 mx-auto mt-5"
+						width={100}
+						height={230}
+						alt="icon"
+						src="/assets/image/a-board.svg"
+					/>
 				</div>
 			</div>
 

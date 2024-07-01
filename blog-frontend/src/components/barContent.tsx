@@ -131,7 +131,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 		refetch: blogRefetch,
 	} = useInfiniteQuery(["blogs", authorId, searchInput, communitySelect], fetchBlogs, {
 		getNextPageParam: (lastPage, pages) => {
-			if (lastPage.result.length < 5) {
+			if (lastPage?.result?.length < 5) {
 				return undefined;
 			}
 			return lastPage.nextPage;
@@ -139,9 +139,11 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	});
 
 	useEffect(() => {
+		console.log("%c === ","color:cyan","  data", data);
+
 		if (data) {
 			const allBlogs = data.pages.reduce((acc, page) => {
-				return [...acc, ...page.result];
+				return [...acc, ...page?.result];
 			}, []);
 			const signInIdList = signInList.map((s: any) => s.signInId);
 			const blogs = allBlogs?.map((blog: any) => {
