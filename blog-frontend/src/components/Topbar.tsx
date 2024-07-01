@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 const Topbar = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isOpenHome, setIsOpenHome] = useState(false);
+	const [isOpenOur, setIsOpenOur] = useState(false);
 	const [username, setUsername] = useState<string | null>(null);
 	const router = useRouter();
 
@@ -15,6 +17,18 @@ const Topbar = () => {
 			setUsername(username);
 		}
 	}, []);
+
+	const handleOpenHome = () => {
+		setIsOpenHome(!isOpenHome);
+		setIsOpenOur(false);
+		router.push("/blog");
+	};
+
+	const handleOpenOur = () => {
+		setIsOpenOur(!isOpenOur);
+		setIsOpenHome(false);
+		router.push("/our-blog");
+	};
 
 	return (
 		<nav className="bg-green-500 p-4 fixed left-0 w-full z-10">
@@ -39,11 +53,11 @@ const Topbar = () => {
 						<button id="menu-toggle" className="text-white py-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
 							{isMenuOpen ? (
 								<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
-									<path d="M18 12l-6 6M18 12l-6-6"></path> {/* Right arrow for collapsing */}
+									<path d="M18 12l-6 6M18 12l-6-6"></path>
 								</svg>
 							) : (
 								<svg fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
-									<path d="M4 6h16M4 12h16M4 18h16"></path> {/* Hamburger menu for expanding */}
+									<path d="M4 6h16M4 12h16M4 18h16"></path>
 								</svg>
 							)}
 						</button>
@@ -63,27 +77,15 @@ const Topbar = () => {
 				<ul className="py-2 text-sm text-white dark:text-gray-200 mt-10 mx-3" aria-labelledby="dropdownDefaultButton">
 					<li className="flex items-center justify-between mt-16">
 						{/* Add home icon in front of Dashboard button */}
-						<button
-							className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}
-							onClick={() => {
-								router.push("/blog");
-								setIsMenuOpen(false);
-							}}
-						>
+						<button className={`flex px-4 py-3  items-center ${isOpenHome ? "font-medium text-green-100" : "text-gray-100"}`} onClick={() => handleOpenHome()}>
 							<Image width={20} height={25} alt="icon" src="/assets/image/ribbon-home.svg" />
 							<span className="ml-3">Home</span>
 						</button>
 					</li>
 					<li className="flex items-center justify-between">
 						{/* Add pencil icon in front of Settings button */}
-						<button
-							className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}
-							onClick={() => {
-								router.push("/our-blog");
-								setIsMenuOpen(false);
-							}}
-						>
-							<Image width={25} height={25} alt="icon" src="/assets/image/ribbon-blog.svg" />
+						<button className={`flex px-4 py-3  items-center ${isOpenOur ? "font-medium text-green-100" : "text-gray-100"}`} onClick={() => handleOpenOur()}>
+							<Image width={20} height={25} alt="icon" src="/assets/image/ribbon-blog.svg" />
 							<span className="ml-3">Our Blog</span>
 						</button>
 					</li>

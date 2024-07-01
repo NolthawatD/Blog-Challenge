@@ -35,10 +35,11 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 
 	const [dropdownOpenModal, setDropdownOpenModal] = useState(false);
 
-	const toggleDropdownModal = () => setDropdownOpenModal(!dropdownOpen);
+	const toggleDropdownModal = () => {
+		setDropdownOpenModal(!dropdownOpen);
+	};
 
 	const pathName = usePathname();
-	const router = useRouter();
 	const [communities, setCommunities] = useState([]);
 	const [searchInput, setSearchInput] = useState("");
 	const [communitySelect, setCommunitySelect] = useState<number[]>([]);
@@ -139,7 +140,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	});
 
 	useEffect(() => {
-		console.log("%c === ","color:cyan","  data", data);
+		console.log("%c === ", "color:cyan", "  data", data);
 
 		if (data) {
 			const allBlogs = data.pages.reduce((acc, page) => {
@@ -387,7 +388,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 									<button
 										id="communityDropdown"
 										onClick={() => {
-											toggleDropdownModal(), setDropdownOpen(!dropdownOpen);
+											toggleDropdownModal();
 										}}
 										type="button"
 										className="w-full md:w-auto bg-white border border-custom-success text-custom-success hover:bg-green-50 font-medium rounded-md text-sm px-4 py-2.5 text-left inline-flex items-center justify-between"
@@ -474,15 +475,17 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 				</div>
 			)}
 
-			<ContentBlog
-				blogs={blogContent}
-				handleToggleRemove={handleToggleRemove}
-				handleToggleEdit={handleToggleEdit}
-				fetchNextPage={fetchNextPage}
-				hasNextPage={hasNextPage ?? false}
-				isLoading={blogIsLoading}
-				error={blogError}
-			/>
+			{!toggleModalCreate && (
+				<ContentBlog
+					blogs={blogContent}
+					handleToggleRemove={handleToggleRemove}
+					handleToggleEdit={handleToggleEdit}
+					fetchNextPage={fetchNextPage}
+					hasNextPage={hasNextPage ?? false}
+					isLoading={blogIsLoading}
+					error={blogError}
+				/>
+			)}
 		</div>
 	);
 }
