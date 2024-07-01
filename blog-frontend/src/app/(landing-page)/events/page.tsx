@@ -70,7 +70,7 @@ export default function Home() {
 			{lastPong && <p>Last pong: {lastPong}</p>}
 
 			<div>
-				<button onClick={sendSignIn}>Send signIn</button>
+				<button onClick={() => sendSignIn()}>Send signIn</button>
 			</div>
 		</div>
 	);

@@ -2,13 +2,12 @@
 
 import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "react-query";
-import InfiniteScroll from "react-infinite-scroll-component";
-
+import useSocket from "@/hooks/useSocket";
 import ContentBlog from "./contentBlog";
+import { backendAPI } from "@/hooks/apiConfig";
 
 interface SearchBarProps {
 	handleToggleRemove: (blogId: number | undefined) => void;
@@ -20,6 +19,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const socket = useSocket(`${backendAPI}/events`);
 
 	const toggleDropdown = () => {
 		setDropdownOpen(!dropdownOpen);
@@ -49,7 +49,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	const [newTitle, setNewTitle] = useState("");
 	const [newContent, setNewContent] = useState("");
 	const [authorId, setAuthorId] = useState<number | null>(null);
-	// const [blogs, setBlogs] = useState<any[]>([]);
+	const [signInList, setSignInList] = useState<unknown[]>([]);
 
 	const queryClient = useQueryClient();
 
@@ -109,7 +109,6 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 		},
 	});
 
-
 	const fetchBlogs = async ({ pageParam = 1 }) => {
 		const res = await fetchData("post", {
 			authorId: pathName === "/our-blog" ? authorId : null,
@@ -141,6 +140,8 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	let blogs = data?.pages.reduce((acc, page) => {
 		return [...acc, ...page.result];
 	}, []);
+
+	// make check use online
 
 	useEffect(() => {
 		if (!communityIsLoading && !blogIsLoading) {
@@ -188,6 +189,46 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, []);
+
+	useEffect(() => {
+		if (socket) {
+			socket.on("connect", () => {
+				console.log("socket connected");
+			});
+
+			socket.on("allSignIn", (events) => {
+				console.log("All sign-in events:", events);
+				setSignInList(events);
+			});
+
+			socket.on("newSignIn", (event) => {
+				setSignInList((prev) => [...prev, event]);
+			});
+
+			socket.on("disconnectSignIn", (event) => {
+				setSignInList((prev) => prev.filter((e: any) => e.signInId !== event.signInId));
+			});
+		}
+		return () => {
+			if (socket) {
+				socket.off("connect");
+				socket.off("disconnect");
+				socket.off("pong");
+				socket.off("allSignIn");
+				socket.off("newSignIn");
+				socket.off("clientDisconnected");
+			}
+		};
+	}, [socket]);
+
+	blogs = blogs?.map((blog: any) => {
+		const is_online = signInList?.findIndex((s: any) => s.signInId === blog?.author_id) > 0;
+		return {
+			...blog,
+			is_online,
+		};
+	});
+	console.log("%c === ", "color:red", "  blogs", blogs);
 
 	return (
 		<div>

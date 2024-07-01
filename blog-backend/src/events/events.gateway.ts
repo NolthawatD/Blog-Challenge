@@ -13,15 +13,15 @@ import { Logger } from "@nestjs/common";
 import { Socket } from "socket.io-client";
 
 interface SignInEvent {
-  clientId: string;
-  payload: string;
-  timestamp: Date;
+	clientId: string;
+	signInId: string;
+	timestamp: Date;
 }
 @WebSocketGateway({
 	namespace: "/events",
 	cors: {
-    origin: '*',
-  },
+		origin: "*",
+	},
 })
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private readonly logger = new Logger(EventsGateway.name);
@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.logger.log(`Client id: ${client.id} connected`);
 		// console.log(`signInEvents, ${JSON.stringify(this.signInEvents)}`);
 
-		this.sendExistingEvents(client)
+		this.sendExistingEvents(client);
 	}
 
 	handleDisconnect(client: any) {
@@ -46,7 +46,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 		// User disconnected
 		const disconnectSign = this.signInEvents.filter((event) => event.clientId == client.id);
-		this.server.emit('disconnectSign', disconnectSign);
+		this.server.emit("disconnectSignIn", disconnectSign[0]);
 
 		// Remove user disconnected
 		this.signInEvents = this.signInEvents.filter((event) => event.clientId !== client.id);
@@ -62,32 +62,33 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		};
 	}
 
-
 	@SubscribeMessage("signIn")
-	handleSignIn(@MessageBody() data: string, @ConnectedSocket() client: Socket): { event: string; data: string } {
+	handleSignIn(@MessageBody() signInId: string, @ConnectedSocket() client: Socket): { event: string; signInId: string } {
 		this.logger.log(`Event: signIn`);
-    this.logger.log(`Message received from client id: ${client.id}`);
-    this.logger.debug(`Payload: ${data}`);
+		this.logger.log(`Message received from client id: ${client.id}`);
+		this.logger.debug(`Payload: ${signInId}`);
 
-		const newEvent: SignInEvent = {
-      clientId: client.id,
-      payload: data,
-      timestamp: new Date()
-    };
+		const newSignIn: SignInEvent = {
+			clientId: client.id,
+			signInId: signInId,
+			timestamp: new Date(),
+		};
 
-		this.signInEvents.push(newEvent);
+		const findExistSingIn = this.signInEvents.findIndex((s) => s.clientId === newSignIn.clientId);
+		if (findExistSingIn > 0){
+			return
+		}
 
-		this.server.emit('newSignIn', newEvent);
+		this.signInEvents.push(newSignIn);
+		this.server.emit("newSignIn", newSignIn);
 
 		return {
 			event: "signIn",
-			data,
+			signInId,
 		};
 	}
 
 	sendExistingEvents(client: Socket) {
-    client.emit('allSignIn', this.signInEvents);
-  }
-
-
+		client.emit("allSignIn", this.signInEvents);
+	}
 }

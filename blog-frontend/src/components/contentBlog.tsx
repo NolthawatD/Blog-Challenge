@@ -46,7 +46,9 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 																alt="icon"
 																src="/assets/image/default.png"
 															/>
-															<span className="absolute bottom-0 right-0 w-3 h-3 bg-custom-success border-2 border-white rounded-full"></span>
+															{blog?.is_online && (
+																<span className="absolute bottom-0 right-0 w-3 h-3 bg-custom-success border-2 border-white rounded-full"></span>
+															)}
 														</div>
 														<p className="text-header">{blog?.author?.username}</p>
 													</div>
