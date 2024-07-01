@@ -8,6 +8,11 @@ import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
 import useSocket from "@/hooks/useSocket";
 import { backendAPI } from "@/hooks/apiConfig";
+import ReactTimeAgo from "react-time-ago";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+
+TimeAgo.addLocale(en);
 
 export default function Detail() {
 	const router = useRouter();
@@ -98,7 +103,6 @@ export default function Detail() {
 	}, [socket]);
 
 	const updatePostDetail = () => {
-		console.log("%c === ", "color:cyan", "  signInList", signInList);
 		const signInIdList = signInList.map((s: any) => s.signInId);
 		setBlogDetail((prev: any) => {
 			const is_online = signInIdList?.includes(prev?.author_id);
@@ -115,11 +119,22 @@ export default function Detail() {
 		}
 	}, [signInList]);
 
+	function parseDate(dateString: any) {
+		return new Date(Date.parse(dateString));
+	}
+
 	return (
 		<div className="bg-white w-full">
 			<div className=" pl-10 pr-10 md:pr-60 py-5">
 				<div className="mb-10">
-					<Image className="hover:cursor-pointer " width={40} height={40} alt="icon" src="/assets/image/icon-arrow.svg" onClick={() => router.push("/blog")} />
+					<Image
+						className="hover:cursor-pointer "
+						width={40}
+						height={40}
+						alt="icon"
+						src="/assets/image/icon-arrow.svg"
+						onClick={() => router.push("/blog")}
+					/>
 				</div>
 				<div className=" top-0 p-4 w-fullrounded-lg">
 					<div className="flex items-center mb-5">
@@ -130,7 +145,8 @@ export default function Detail() {
 							)}
 						</div>
 						<p className="text-header">
-							{blogDetail?.author?.username} <span className="text-span text-xs ms-3">5mo. ago xxxxxx</span>
+							{blogDetail?.author?.username}{" "}
+							<span className="text-span text-xs ms-3">{<ReactTimeAgo date={parseDate(blogDetail?.created_at || new Date())} locale="en-US" timeStyle="mini"/>}. ago</span>
 						</p>
 					</div>
 					<div className="py-1 px-4 bg-gray-300	rounded-full w-max">
