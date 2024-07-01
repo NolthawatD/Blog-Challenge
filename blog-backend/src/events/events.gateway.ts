@@ -66,7 +66,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	handleSignIn(@MessageBody() signInId: string, @ConnectedSocket() client: Socket): { event: string; signInId: string } {
 		this.logger.log(`Event: signIn`);
 		this.logger.log(`Message received from client id: ${client.id}`);
-		this.logger.debug(`Payload: ${signInId}`);
+		this.logger.debug(`signInId: ${signInId}`);
 
 		const newSignIn: SignInEvent = {
 			clientId: client.id,
@@ -74,13 +74,14 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			timestamp: new Date(),
 		};
 
-		const findExistSingIn = this.signInEvents.findIndex((s) => s.clientId === newSignIn.clientId);
+		const findExistSingIn = this.signInEvents.findIndex((s) => s.signInId === newSignIn.signInId);
 		if (findExistSingIn > 0){
 			return
 		}
 
 		this.signInEvents.push(newSignIn);
 		this.server.emit("newSignIn", newSignIn);
+		this.server.emit("allSignIn", this.signInEvents);
 
 		return {
 			event: "signIn",

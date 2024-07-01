@@ -3,7 +3,7 @@
 import ContentBlog from "@/components/contentBlog";
 import ModalEdit from "@/components/modalEdit";
 import ModalRemove from "@/components/modalRemove";
-import SearchBar from "@/components/searchBar";
+import SearchBar from "@/components/barContent";
 import { useState } from "react";
 
 export default function OurBlog() {

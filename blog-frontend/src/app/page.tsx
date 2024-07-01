@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { redirect, useSearchParams, useRouter } from "next/navigation";
 import { useSignIn } from "@/hooks/useSignIn";
-import useSocket from "@/hooks/useSocket";
-import { backendAPI } from "@/hooks/apiConfig";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const SignIn = () => {
-	const socket = useSocket(`${backendAPI}/events`);
 	const searchParams = useSearchParams();
 	const event = searchParams.get("event");
 	const [username, setUsername] = useState<string>("");
@@ -27,9 +24,6 @@ const SignIn = () => {
 			const { data } = response;
 			localStorage.setItem("username", data.username);
 			localStorage.setItem("userId", data.id);
-			if (socket) {
-				socket.emit("signIn", data.id);
-			}
 		}
 		router.push("/blog");
 	};

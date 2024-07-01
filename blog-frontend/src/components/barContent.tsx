@@ -3,7 +3,7 @@
 import { fetchData } from "@/hooks/fetch";
 import { mutationData } from "@/hooks/mutation";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "react-query";
 import useSocket from "@/hooks/useSocket";
 import ContentBlog from "./contentBlog";
@@ -50,6 +50,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	const [newContent, setNewContent] = useState("");
 	const [authorId, setAuthorId] = useState<number | null>(null);
 	const [signInList, setSignInList] = useState<unknown[]>([]);
+	const [blogContent, setBlogContent] = useState<unknown[]>([]);
 
 	const queryClient = useQueryClient();
 
@@ -137,11 +138,23 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 		},
 	});
 
-	let blogs = data?.pages.reduce((acc, page) => {
-		return [...acc, ...page.result];
-	}, []);
-
-	// make check use online
+	useEffect(() => {
+		if (data) {
+			const allBlogs = data.pages.reduce((acc, page) => {
+				return [...acc, ...page.result];
+			}, []);
+			const signInIdList = signInList.map((s: any) => s.signInId);
+			const blogs = allBlogs?.map((blog: any) => {
+				const is_online = signInIdList.includes(blog?.author_id);
+				return {
+					...blog,
+					is_online,
+				};
+			});
+			// console.log("%c === ", "color:orange", "  blogs", blogs);
+			setBlogContent(blogs);
+		}
+	}, [data, signInList]);
 
 	useEffect(() => {
 		if (!communityIsLoading && !blogIsLoading) {
@@ -182,9 +195,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 				setDropdownOpen(false);
 			}
 		};
-
 		document.addEventListener("mousedown", handleClickOutside);
-
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
@@ -197,7 +208,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			});
 
 			socket.on("allSignIn", (events) => {
-				console.log("All sign-in events:", events);
+				// console.log("All sign-in events:", events);
 				setSignInList(events);
 			});
 
@@ -206,8 +217,13 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			});
 
 			socket.on("disconnectSignIn", (event) => {
-				setSignInList((prev) => prev.filter((e: any) => e.signInId !== event.signInId));
+				setSignInList((prev) => prev.filter((e: any) => e?.signInId !== event?.signInId));
 			});
+
+			if (authorId) {
+				console.log("%c === ", "color:cyan", "  authorId", authorId);
+				socket.emit("signIn", authorId);
+			}
 		}
 		return () => {
 			if (socket) {
@@ -220,15 +236,6 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			}
 		};
 	}, [socket]);
-
-	blogs = blogs?.map((blog: any) => {
-		const is_online = signInList?.findIndex((s: any) => s.signInId === blog?.author_id) > 0;
-		return {
-			...blog,
-			is_online,
-		};
-	});
-	console.log("%c === ", "color:red", "  blogs", blogs);
 
 	return (
 		<div>
@@ -470,7 +477,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			)}
 
 			<ContentBlog
-				blogs={blogs}
+				blogs={blogContent}
 				handleToggleRemove={handleToggleRemove}
 				handleToggleEdit={handleToggleEdit}
 				fetchNextPage={fetchNextPage}
