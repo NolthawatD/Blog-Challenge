@@ -77,9 +77,7 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 			alert("Please sign in before");
 			return;
 		}
-
 		mutation.mutate();
-
 		handleToggleModalCreate();
 	};
 
@@ -415,13 +413,6 @@ export default function SearchBar({ setBlogs }: SearchBarProps) {
 	);
 }
 
-const TrueSign = () => {
-	return (
-		<svg className="w-4 h-4 ml-2 mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-		</svg>
-	);
-};
 
 const SearchSign = ({ propClass }: { propClass: string }) => {
 	return (
