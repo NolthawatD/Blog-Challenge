@@ -138,7 +138,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 		},
 	});
 
-	const blogs = data?.pages.reduce((acc, page) => {
+	let blogs = data?.pages.reduce((acc, page) => {
 		return [...acc, ...page.result];
 	}, []);
 

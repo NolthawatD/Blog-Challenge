@@ -38,13 +38,16 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 											<div className="sticky top-0 p-4 w-fullrounded-lg">
 												<div className="flex items-center mb-4 justify-between">
 													<div className="flex items-center">
-														<Image
-															className="rounded-full w-10 h-10 mr-3"
-															width={50}
-															height={50}
-															alt="icon"
-															src="/assets/image/default.png"
-														/>
+														<div className="relative inline-block">
+															<Image
+																className="rounded-full w-10 h-10 mr-3"
+																width={50}
+																height={50}
+																alt="icon"
+																src="/assets/image/default.png"
+															/>
+															<span className="absolute bottom-0 right-0 w-3 h-3 bg-custom-success border-2 border-white rounded-full"></span>
+														</div>
 														<p className="text-header">{blog?.author?.username}</p>
 													</div>
 													{pathName === "/our-blog" && (
