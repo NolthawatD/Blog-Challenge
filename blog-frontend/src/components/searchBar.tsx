@@ -5,7 +5,9 @@ import { mutationData } from "@/hooks/mutation";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "react-query";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 import ContentBlog from "./contentBlog";
 
 interface SearchBarProps {
@@ -47,7 +49,7 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 	const [newTitle, setNewTitle] = useState("");
 	const [newContent, setNewContent] = useState("");
 	const [authorId, setAuthorId] = useState<number | null>(null);
-	const [blogs, setBlogs] = useState<any[]>([]);
+	// const [blogs, setBlogs] = useState<any[]>([]);
 
 	const queryClient = useQueryClient();
 
@@ -107,28 +109,38 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 		},
 	});
 
+
+	const fetchBlogs = async ({ pageParam = 1 }) => {
+		const res = await fetchData("post", {
+			authorId: pathName === "/our-blog" ? authorId : null,
+			title: searchInput,
+			content: "",
+			communityId: JSON.stringify(communitySelect),
+			page: pageParam,
+			limit: 5,
+		});
+		return { ...res.data, nextPage: pageParam + 1 };
+	};
+
 	const {
-		data: blogData,
+		data,
+		fetchNextPage,
+		hasNextPage,
 		isLoading: blogIsLoading,
 		error: blogError,
 		refetch: blogRefetch,
-	} = useQuery(
-		["blogs", authorId, searchInput, communitySelect],
-		() =>
-			fetchData("post", {
-				authorId: pathName === "/our-blog" ? authorId : null,
-				title: searchInput,
-				content: "",
-				communityId: JSON.stringify(communitySelect),
-				page: 1,
-				limit: 10,
-			}),
-		{
-			onSuccess: (data) => {
-				setBlogs(data?.data?.result);
-			},
-		}
-	);
+	} = useInfiniteQuery(["blogs", authorId, searchInput, communitySelect], fetchBlogs, {
+		getNextPageParam: (lastPage, pages) => {
+			if (lastPage.result.length < 5) {
+				return undefined;
+			}
+			return lastPage.nextPage;
+		},
+	});
+
+	const blogs = data?.pages.reduce((acc, page) => {
+		return [...acc, ...page.result];
+	}, []);
 
 	useEffect(() => {
 		if (!communityIsLoading && !blogIsLoading) {
@@ -176,10 +188,6 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, []);
-
-	const handleShowDetail = (blogId: number) => {
-		router.push(`/blog/${blogId}`);
-	};
 
 	return (
 		<div>
@@ -420,7 +428,15 @@ export default function SearchBar({ handleToggleRemove, handleToggleEdit }: Sear
 				</div>
 			)}
 
-			<ContentBlog blogs={blogs} handleToggleRemove={handleToggleRemove} handleToggleEdit={handleToggleEdit} />
+			<ContentBlog
+				blogs={blogs}
+				handleToggleRemove={handleToggleRemove}
+				handleToggleEdit={handleToggleEdit}
+				fetchNextPage={fetchNextPage}
+				hasNextPage={hasNextPage ?? false}
+				isLoading={blogIsLoading}
+				error={blogError}
+			/>
 		</div>
 	);
 }
