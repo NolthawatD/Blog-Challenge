@@ -26,11 +26,11 @@ const Topbar = () => {
 					{!username ? (
 						<div
 							className="py-2 px-8 bg-custom-success hover:bg-green-300 rounded-md group cursor-pointer hover:shadow-lg hidden md:block mb"
-							onClick={() => router.push("/dashboard")}
+							onClick={() => router.push("/?event=signIn")}
 						>
 							<h3 className="text-white font-semibold">Sign in</h3>
 						</div>
-					): (
+					) : (
 						<p className="text-white font-san mr-20 py-2 hidden md:block">{username}</p>
 					)}
 
@@ -63,14 +63,26 @@ const Topbar = () => {
 				<ul className="py-2 text-sm text-white dark:text-gray-200 mt-10 mx-3" aria-labelledby="dropdownDefaultButton">
 					<li className="flex items-center justify-between mt-16">
 						{/* Add home icon in front of Dashboard button */}
-						<button className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}>
+						<button
+							className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}
+							onClick={() => {
+								router.push("/blog");
+								setIsMenuOpen(false);
+							}}
+						>
 							<Image width={20} height={25} alt="icon" src="/assets/image/ribbon-home.svg" />
 							<span className="ml-3">Home</span>
 						</button>
 					</li>
 					<li className="flex items-center justify-between">
 						{/* Add pencil icon in front of Settings button */}
-						<button className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}>
+						<button
+							className={`flex px-4 py-3  items-center ${true ? "font-medium text-white" : ""}`}
+							onClick={() => {
+								router.push("/our-blog");
+								setIsMenuOpen(false);
+							}}
+						>
 							<Image width={25} height={25} alt="icon" src="/assets/image/ribbon-blog.svg" />
 							<span className="ml-3">Our Blog</span>
 						</button>

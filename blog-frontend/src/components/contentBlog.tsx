@@ -38,7 +38,7 @@ export default function ContentBlog({ blogs, handleToggleRemove, handleToggleEdi
 														alt="icon"
 														src="/assets/image/default.png"
 													/>
-													<p className="text-header">Wittawat</p>
+													<p className="text-header">{blog?.author?.username}</p>
 												</div>
 												{pathName === "/our-blog" && (
 													<div className="flex items-center">
